@@ -55,8 +55,10 @@ jobs:
           echo "$PACK_OUTPUT"
           TARBALL=$(printf '%s\n' "$PACK_OUTPUT" | tail -n 1 | tr -d '[:space:]')
           echo "Packed tarball: $TARBALL"
-          echo "Listing contents:" && tar -tf "$TARBALL" | sed -n '1,200p'
-          tar -tf "$TARBALL" | grep -q '^package/dist/index.mjs$'
-          tar -tf "$TARBALL" | grep -q '^package/dist/index.cjs$'
-          tar -tf "$TARBALL" | grep -q '^package/dist/index.d.ts$'
+          LISTING=$(tar -tf "$TARBALL")
+          echo "Listing contents:"
+          printf '%s\n' "$LISTING" | sed -n '1,200p'
+          printf '%s\n' "$LISTING" | grep -q '^package/dist/index.mjs$'
+          printf '%s\n' "$LISTING" | grep -q '^package/dist/index.cjs$'
+          printf '%s\n' "$LISTING" | grep -q '^package/dist/index.d.ts$'
           rm -f "$TARBALL"
