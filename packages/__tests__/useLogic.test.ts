@@ -1,12 +1,12 @@
+import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
-import { mount } from "@vue/test-utils";
 
 import {
+	type LogicInstance,
 	cleanupLogics,
 	defineLogic,
 	onUnmount,
-	type LogicInstance,
 } from "@sigrea/core";
 
 import { useLogic } from "../useLogic";

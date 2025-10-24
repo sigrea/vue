@@ -8,7 +8,9 @@ export function useLogic<TReturn extends object, TProps = void>(
 	...args: LogicArgs<TProps>
 ): LogicInstance<TReturn> {
 	if (getCurrentInstance() === null) {
-		throw new Error("useLogic can only be used within a Vue component setup().");
+		throw new Error(
+			"useLogic can only be used within a Vue component setup().",
+		);
 	}
 
 	const instance = mountLogic(logic, ...args);
@@ -19,4 +21,3 @@ export function useLogic<TReturn extends object, TProps = void>(
 
 	return instance;
 }
-

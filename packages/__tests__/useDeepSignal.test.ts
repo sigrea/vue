@@ -1,7 +1,7 @@
+import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { defineComponent, h } from "vue";
 import type { ShallowRef } from "vue";
-import { mount } from "@vue/test-utils";
 
 import { deepSignal } from "@sigrea/core";
 

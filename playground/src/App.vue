@@ -8,7 +8,8 @@ const initialCount = ref(0);
 const step = ref(1);
 
 const counterKey = computed(
-	() => `${initialCount.value}:${step.value}:${showCounter.value ? "on" : "off"}`,
+	() =>
+		`${initialCount.value}:${step.value}:${showCounter.value ? "on" : "off"}`,
 );
 
 const toggle = () => {

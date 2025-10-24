@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { defineComponent, h } from "vue";
 import type { SnapshotHandler } from "@sigrea/core";
 import { createSignalHandler, signal } from "@sigrea/core";
 import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import { defineComponent, h } from "vue";
 
 import { useSnapshot } from "../useSnapshot";
 import { flushEffects } from "./testUtils";

@@ -1,6 +1,6 @@
+import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
-import { mount } from "@vue/test-utils";
 
 import type { Signal } from "@sigrea/core";
 import { readonly, signal } from "@sigrea/core";
