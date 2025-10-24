@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"target": "ES2023",
+		"lib": ["ES2023", "DOM"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"declaration": true,
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"outDir": "dist",
+		"types": ["vitest/globals", "vue"]
+	},
+	"include": [
+		"index.ts",
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"packages/**/*.ts",
+		"packages/**/*.tsx"
+	],
+	"exclude": ["dist", "node_modules"]
+}
