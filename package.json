@@ -42,7 +42,7 @@
 		"format:fix": "biome check --write ."
 	},
 	"peerDependencies": {
-		"@sigrea/core": "^0.1.0",
+		"@sigrea/core": "^0.3.1",
 		"vue": "^3.4.0"
 	},
 	"devDependencies": {
