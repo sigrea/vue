@@ -1,5 +1,17 @@
 # @sigrea/vue
 
+## v0.2.1
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.2.0...v0.2.1)
+
+### 🎨 Styles
+
+- Inline package manifest arrays ([0a0f765](https://github.com/sigrea/vue/commit/0a0f765))
+
+### ❤️ Contributors
+
+- Aose-yuu <aose.developer@gmail.com>
+
 ## v0.2.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.1.0...v0.2.0)
