@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@sigrea/core':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.3.1
+        version: 0.3.1
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -739,8 +739,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sigrea/core@0.1.0':
-    resolution: {integrity: sha512-3KZH7agO+JvoEKTQDQ1//X7aGn2x7igPm4mnh77z6JgcOQir18FHZM+RNuCZEJbeRlX4CYWrF7ZdRuFhxUzIDA==}
+  '@sigrea/core@0.3.1':
+    resolution: {integrity: sha512-pT5QOKRXx2zR4XD5U/9O+0wkb5pvc7DnKHo1E+Sr/Q6+XM/YOpt+IQh9ObFSpX6FzM6IVL5vzq1I2FYtyOS73g==}
     engines: {node: '>=20'}
 
   '@types/chai@5.2.3':
@@ -847,11 +847,6 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
-
-  alien-deepsignals@0.2.7:
-    resolution: {integrity: sha512-fERozTuMRWzO5fv9xBNk1Zm0ZxUllRPiMckoyQcEcCBZ4mpEiZhVnmmSqn26i5KwYnDcZxjS2LAo/o6QjzoEOQ==}
-    peerDependencies:
-      alien-signals: ^3.0.1
 
   alien-signals@3.0.3:
     resolution: {integrity: sha512-2JXjom6R7ZwrISpUphLhf4htUq1aKRCennTJ6u9kFfr3sLmC9+I4CxxVi+McoFnIg+p1HnVrfLT/iCt4Dlz//Q==}
@@ -2820,9 +2815,8 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
-  '@sigrea/core@0.1.0':
+  '@sigrea/core@0.3.1':
     dependencies:
-      alien-deepsignals: 0.2.7(alien-signals@3.0.3)
       alien-signals: 3.0.3
 
   '@types/chai@5.2.3':
@@ -2968,10 +2962,6 @@ snapshots:
   acorn@8.15.0: {}
 
   agent-base@7.1.4: {}
-
-  alien-deepsignals@0.2.7(alien-signals@3.0.3):
-    dependencies:
-      alien-signals: 3.0.3
 
   alien-signals@3.0.3: {}
 
