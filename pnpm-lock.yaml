@@ -7,13 +7,14 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@sigrea/core':
+        specifier: ^0.3.1
+        version: 0.3.1
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
-      '@sigrea/core':
-        specifier: ^0.3.1
-        version: 0.3.1
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.2.4(vite@5.4.21)(vue@3.5.22(typescript@5.9.3))
@@ -652,6 +653,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sigrea/core@0.3.1':
+    resolution: {integrity: sha512-pT5QOKRXx2zR4XD5U/9O+0wkb5pvc7DnKHo1E+Sr/Q6+XM/YOpt+IQh9ObFSpX6FzM6IVL5vzq1I2FYtyOS73g==}
+    engines: {node: '>=20'}
+
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
@@ -753,6 +758,9 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
+
+  alien-signals@3.1.1:
+    resolution: {integrity: sha512-ogkIWbVrLwKtHY6oOAXaYkAxP+cTH7V5FZ5+Tm4NZFd8VDZ6uNMDrfzqctTZ42eTMCSR3ne3otpcxmqSnFfPYA==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -2414,6 +2422,10 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
+  '@sigrea/core@0.3.1':
+    dependencies:
+      alien-signals: 3.1.1
+
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -2555,6 +2567,8 @@ snapshots:
   acorn@8.15.0: {}
 
   agent-base@7.1.4: {}
+
+  alien-signals@3.1.1: {}
 
   ansi-regex@5.0.1: {}
 
