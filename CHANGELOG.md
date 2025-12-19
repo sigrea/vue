@@ -1,5 +1,27 @@
 # @sigrea/vue
 
+## v0.3.0
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.2.1...v0.3.0)
+
+### 🚀 Enhancements
+
+- ⚠️  Migrate adapter to Molecule API ([#10](https://github.com/sigrea/vue/pull/10))
+
+### 🤖 CI
+
+- Migrate to OIDC trusted publishing ([#9](https://github.com/sigrea/vue/pull/9))
+- Fix publish workflow to use OIDC ([78d6609](https://github.com/sigrea/vue/commit/78d6609))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Migrate adapter to Molecule API ([#10](https://github.com/sigrea/vue/pull/10))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+- Aose-yuu <aose.developer@gmail.com>
+
 ## v0.2.1
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.2.0...v0.2.1)
