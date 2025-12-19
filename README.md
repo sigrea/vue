@@ -1,19 +1,19 @@
 # @sigrea/vue
 
-`@sigrea/vue` adapts [@sigrea/core](https://www.npmjs.com/package/@sigrea/core) logic modules and signals for Vue 3's Composition API. It aligns lifecycle scopes with component lifecycles, preserves deep reactivity, and provides composables for `<script setup>` and traditional setup functions.
+`@sigrea/vue` adapts [@sigrea/core](https://www.npmjs.com/package/@sigrea/core) molecule modules and signals for Vue 3's Composition API. It aligns lifecycle scopes with component lifecycles, preserves deep reactivity, and provides composables for `<script setup>` and traditional setup functions.
 
 - **Signal subscriptions.** `useSignal` subscribes to signals and computed values, returning a readonly ref that updates when they change.
 - **Computed subscriptions.** `useComputed` subscribes to computed values, mirroring Vue's `computed` while tracking through Sigrea scopes.
 - **Deep signal subscriptions.** `useDeepSignal` subscribes to deep signal objects and exposes them as mutable refs with automatic cleanup.
 - **Two-way bindings.** `useMutableSignal` wraps primitive signals as `WritableComputedRef` for two-way bindings like `v-model`.
-- **Logic lifecycles.** `useLogic` mounts logic factories and binds their lifecycles to Vue components.
+- **Molecule lifecycles.** `useMolcule` mounts molecule factories and binds their lifecycles to Vue components.
 
 ## Table of Contents
 
 - [Install](#install)
 - [Quick Start](#quick-start)
   - [Consume a Signal](#consume-a-signal)
-  - [Bridge Framework-Agnostic Logic](#bridge-framework-agnostic-logic)
+  - [Bridge Framework-Agnostic Molecules](#bridge-framework-agnostic-molecules)
   - [Bind Writable Primitive Signals](#bind-writable-primitive-signals)
   - [Bind Deep Reactive Objects](#bind-deep-reactive-objects)
 - [API Reference](#api-reference)
@@ -21,7 +21,7 @@
   - [useComputed](#usecomputed)
   - [useDeepSignal](#usedeepsignal)
   - [useMutableSignal](#usemutablesignal)
-  - [useLogic](#uselogic)
+  - [useMolcule](#usemolcule)
 - [Testing](#testing)
 - [Development](#development)
 - [License](#license)
@@ -52,13 +52,13 @@ const value = useSignal(count);
 </template>
 ```
 
-### Bridge Framework-Agnostic Logic
+### Bridge Framework-Agnostic Molecules
 
 ```ts
-// CounterLogic.ts
-import { defineLogic, signal } from "@sigrea/core";
+// CounterMolecule.ts
+import { molecule, signal } from "@sigrea/core";
 
-export const CounterLogic = defineLogic<{ initialCount: number }>()((props) => {
+export const CounterMolecule = molecule((props: { initialCount: number }) => {
   const count = signal(props.initialCount);
 
   const increment = () => {
@@ -76,11 +76,11 @@ export const CounterLogic = defineLogic<{ initialCount: number }>()((props) => {
 ```vue
 <!-- Counter.vue -->
 <script setup lang="ts">
-import { useLogic, useSignal } from "@sigrea/vue";
-import { CounterLogic } from "./CounterLogic";
+import { useMolcule, useSignal } from "@sigrea/vue";
+import { CounterMolecule } from "./CounterMolecule";
 
 const props = defineProps<{ initialCount: number }>();
-const counter = useLogic(CounterLogic, props);
+const counter = useMolcule(CounterMolecule, props);
 const value = useSignal(counter.count);
 </script>
 
@@ -169,26 +169,23 @@ function useMutableSignal<T>(signal: Signal<T>): WritableComputedRef<T>
 
 Wraps a Sigrea signal as a Vue `WritableComputedRef` for two-way bindings like `v-model`. Expects a writable signal created by `signal()`. Passing a readonly signal throws at runtime.
 
-### useLogic
+### useMolcule
 
 ```ts
-function useLogic<TReturn extends object, TProps = void>(
-  logic: LogicFunction<TReturn, TProps>,
-  ...args: LogicArgs<TProps>
-): LogicInstance<TReturn>
+function useMolcule<TReturn extends object, TProps = void>(
+  molecule: MoleculeFactory<TReturn, TProps>,
+  ...args: MoleculeArgs<TProps>
+): MoleculeInstance<TReturn>
 ```
 
-Mounts a logic factory and returns its LogicInstance. Sigrea augments the logic with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
+Mounts a molecule factory and returns its MoleculeInstance. Sigrea augments the molecule with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
 
 ## Testing
 
 ```ts
 // tests/Counter.test.ts
 import { mount } from "@vue/test-utils";
-import { cleanupLogics } from "@sigrea/core";
 import Counter from "../components/Counter.vue";
-
-afterEach(() => cleanupLogics());
 
 it("increments and displays the updated count", async () => {
   const wrapper = mount(Counter, {

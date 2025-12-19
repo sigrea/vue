@@ -1,13 +1,12 @@
-import { defineLogic, onMount, onUnmount, signal, watch } from "@sigrea/core";
+import { molecule, onMount, onUnmount, signal, watch } from "@sigrea/core";
 
 export interface CounterProps {
 	initialCount?: number;
 	step?: number;
 }
 
-const createCounterLogic = defineLogic<CounterProps>();
-
-export const CounterLogic = createCounterLogic(({ initialCount, step }) => {
+export const CounterMolecule = molecule((props: CounterProps) => {
+	const { initialCount, step } = props;
 	const initial = initialCount ?? 0;
 	const incrementStep = step ?? 1;
 	const count = signal(initial);
