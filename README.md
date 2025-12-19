@@ -200,7 +200,15 @@ it("increments and displays the updated count", async () => {
 
 ## Development
 
-Development scripts prefer pnpm. npm or yarn work too, but pnpm keeps dependency resolution identical to CI.
+This repo targets Node.js 20 or later.
+
+If you use mise:
+
+- `mise trust -y` — trust `mise.toml` (first run only).
+- `mise run ci` — run CI-equivalent checks locally.
+- `mise run notes` — preview release notes (optional).
+
+You can also run pnpm scripts directly:
 
 - `pnpm install` — install dependencies.
 - `pnpm test` — run the Vitest suite once (no watch).
