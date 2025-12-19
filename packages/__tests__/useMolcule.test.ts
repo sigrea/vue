@@ -3,40 +3,40 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
 
 import {
-	type LogicInstance,
-	cleanupLogics,
-	defineLogic,
+	type MoleculeInstance,
+	disposeTrackedMolecules,
+	molecule,
 	onUnmount,
 } from "@sigrea/core";
 
-import { useLogic } from "../useLogic";
+import { useMolcule } from "../useMolcule";
 import { flushEffects } from "./testUtils";
 
-describe("useLogic", () => {
+describe("useMolcule", () => {
 	afterEach(() => {
-		cleanupLogics();
+		disposeTrackedMolecules();
 	});
 
 	it("throws when invoked without an active component instance", () => {
-		const logic = defineLogic<void>()(() => ({}));
+		const counterMolcule = molecule(() => ({}));
 
-		expect(() => useLogic(logic)).toThrow(
-			"useLogic can only be used within a Vue component setup().",
+		expect(() => useMolcule(counterMolcule)).toThrow(
+			"useMolcule can only be used within a Vue component setup().",
 		);
 	});
 
-	it("mounts logic and disposes it alongside the component", async () => {
+	it("mounts molecule and disposes it alongside the component", async () => {
 		const cleanups = vi.fn();
-		const logic = defineLogic<number>()((value) => {
+		const counterMolcule = molecule((value: number) => {
 			onUnmount(() => cleanups(value));
 			return { value };
 		});
 
-		const observed: Array<LogicInstance<{ value: number }>> = [];
+		const observed: Array<MoleculeInstance<{ value: number }>> = [];
 
 		const wrapper = mount(
 			defineComponent(() => {
-				const instance = useLogic(logic, 1);
+				const instance = useMolcule(counterMolcule, 1);
 				observed.push(instance);
 				return () => null;
 			}),
