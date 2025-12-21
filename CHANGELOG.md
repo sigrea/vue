@@ -1,5 +1,23 @@
 # @sigrea/vue
 
+## v0.4.0
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.3.1...v0.4.0)
+
+### 🩹 Fixes
+
+- Correct useMolecule spelling in Vue adapter ([c40a81a](https://github.com/sigrea/vue/commit/c40a81a))
+- Correct useMolecule spelling in Vue adapter ([#14](https://github.com/sigrea/vue/pull/14))
+
+### 🎨 Styles
+
+- Format package.json ([3b1b360](https://github.com/sigrea/vue/commit/3b1b360))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+- Aose-yuu <aose.developer@gmail.com>
+
 ## v0.3.1
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.3.0...v0.3.1)
