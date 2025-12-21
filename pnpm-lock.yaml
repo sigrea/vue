@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@sigrea/core':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.4.3
+        version: 0.4.3
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -653,8 +653,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sigrea/core@0.4.0':
-    resolution: {integrity: sha512-5/ppPY8o7/pYsxpxdqf+x+kuwg08Y9V3F/BC8h+azjHC+ctmmXtznTSsGASpeD4jG5KgEbc7SfbA8eFJnvp9xw==}
+  '@sigrea/core@0.4.3':
+    resolution: {integrity: sha512-3jB26ZIkPrYDW0gwGT6FIObuXtA8Q/9pKpEmUVHPpmfa1ut0pMq7e5DP5an4sEoohsjiU1H4//Eu6+SvWiE1Aw==}
     engines: {node: '>=20'}
 
   '@types/chai@5.2.3':
@@ -2422,7 +2422,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
-  '@sigrea/core@0.4.0':
+  '@sigrea/core@0.4.3':
     dependencies:
       alien-signals: 3.1.1
 

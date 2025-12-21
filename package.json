@@ -45,7 +45,7 @@
 		"cicheck": "pnpm test && pnpm typecheck && pnpm format:fix"
 	},
 	"peerDependencies": {
-		"@sigrea/core": "^0.4.0",
+		"@sigrea/core": "^0.4.3",
 		"vue": "^3.4.0"
 	},
 	"devDependencies": {
