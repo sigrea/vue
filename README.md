@@ -23,6 +23,7 @@
   - [useMutableSignal](#usemutablesignal)
   - [useMolcule](#usemolcule)
 - [Testing](#testing)
+- [Handling Scope Cleanup Errors](#handling-scope-cleanup-errors)
 - [Development](#development)
 - [License](#license)
 
@@ -198,6 +199,32 @@ it("increments and displays the updated count", async () => {
 });
 ```
 
+## Handling Scope Cleanup Errors
+
+For global error handling configuration, see [@sigrea/core - Handling Scope Cleanup Errors](https://github.com/sigrea/core#handling-scope-cleanup-errors).
+
+In Vue apps, configure the handler in your application entry point before mounting:
+
+```ts
+// main.ts
+import { setScopeCleanupErrorHandler } from "@sigrea/core";
+import { createApp } from "vue";
+import App from "./App.vue";
+
+setScopeCleanupErrorHandler((error, context) => {
+  console.error(`Cleanup failed:`, error);
+
+  // Forward to monitoring service
+  if (typeof Sentry !== "undefined") {
+    Sentry.captureException(error, {
+      tags: { scopeId: context.scopeId, phase: context.phase },
+    });
+  }
+});
+
+createApp(App).mount("#app");
+```
+
 ## Development
 
 This repo targets Node.js 20 or later.
@@ -212,8 +239,13 @@ You can also run pnpm scripts directly:
 
 - `pnpm install` — install dependencies.
 - `pnpm test` — run the Vitest suite once (no watch).
+- `pnpm typecheck` — run TypeScript type checking.
+- `pnpm test:coverage` — collect coverage.
 - `pnpm build` — compile via unbuild to produce dual CJS/ESM bundles.
+- `pnpm cicheck` — run CI checks locally.
 - `pnpm dev` — launch the playground counter demo.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow details.
 
 ## License
 
