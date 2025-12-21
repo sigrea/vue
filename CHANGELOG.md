@@ -1,5 +1,24 @@
 # @sigrea/vue
 
+## v0.3.1
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.3.0...v0.3.1)
+
+### 📖 Documentation
+
+- Enhance documentation and project setup ([#12](https://github.com/sigrea/vue/pull/12))
+
+### 🏡 Chore
+
+- Add mise tasks ([#11](https://github.com/sigrea/vue/pull/11))
+- Bump core peer dependency to 0.4.3 ([d7c8d06](https://github.com/sigrea/vue/commit/d7c8d06))
+- Bump core to 0.4.3 ([#13](https://github.com/sigrea/vue/pull/13))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+- Aose-yuu <aose.developer@gmail.com>
+
 ## v0.3.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.2.1...v0.3.0)
