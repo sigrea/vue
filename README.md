@@ -6,7 +6,7 @@
 - **Computed subscriptions.** `useComputed` subscribes to computed values, mirroring Vue's `computed` while tracking through Sigrea scopes.
 - **Deep signal subscriptions.** `useDeepSignal` subscribes to deep signal objects and exposes them as mutable refs with automatic cleanup.
 - **Two-way bindings.** `useMutableSignal` wraps primitive signals as `WritableComputedRef` for two-way bindings like `v-model`.
-- **Molecule lifecycles.** `useMolcule` mounts molecule factories and binds their lifecycles to Vue components.
+- **Molecule lifecycles.** `useMolecule` mounts molecule factories and binds their lifecycles to Vue components.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@
   - [useComputed](#usecomputed)
   - [useDeepSignal](#usedeepsignal)
   - [useMutableSignal](#usemutablesignal)
-  - [useMolcule](#usemolcule)
+  - [useMolecule](#usemolecule)
 - [Testing](#testing)
 - [Handling Scope Cleanup Errors](#handling-scope-cleanup-errors)
 - [Development](#development)
@@ -77,11 +77,11 @@ export const CounterMolecule = molecule((props: { initialCount: number }) => {
 ```vue
 <!-- Counter.vue -->
 <script setup lang="ts">
-import { useMolcule, useSignal } from "@sigrea/vue";
+import { useMolecule, useSignal } from "@sigrea/vue";
 import { CounterMolecule } from "./CounterMolecule";
 
 const props = defineProps<{ initialCount: number }>();
-const counter = useMolcule(CounterMolecule, props);
+const counter = useMolecule(CounterMolecule, props);
 const value = useSignal(counter.count);
 </script>
 
@@ -170,10 +170,10 @@ function useMutableSignal<T>(signal: Signal<T>): WritableComputedRef<T>
 
 Wraps a Sigrea signal as a Vue `WritableComputedRef` for two-way bindings like `v-model`. Expects a writable signal created by `signal()`. Passing a readonly signal throws at runtime.
 
-### useMolcule
+### useMolecule
 
 ```ts
-function useMolcule<TReturn extends object, TProps = void>(
+function useMolecule<TReturn extends object, TProps = void>(
   molecule: MoleculeFactory<TReturn, TProps>,
   ...args: MoleculeArgs<TProps>
 ): MoleculeInstance<TReturn>

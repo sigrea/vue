@@ -7,13 +7,13 @@ import type {
 } from "@sigrea/core";
 import { disposeMolecule } from "@sigrea/core";
 
-export function useMolcule<TReturn extends object, TProps = void>(
+export function useMolecule<TReturn extends object, TProps = void>(
 	molecule: MoleculeFactory<TReturn, TProps>,
 	...args: MoleculeArgs<TProps>
 ): MoleculeInstance<TReturn> {
 	if (getCurrentInstance() === null) {
 		throw new Error(
-			"useMolcule can only be used within a Vue component setup().",
+			"useMolecule can only be used within a Vue component setup().",
 		);
 	}
 

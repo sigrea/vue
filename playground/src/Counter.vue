@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useMolcule, useMutableSignal } from "@sigrea/vue";
+import { useMolecule, useMutableSignal } from "@sigrea/vue";
 import { CounterMolecule, type CounterProps } from "./CounterMolecule";
 
 const props = defineProps<CounterProps>();
 
-const counter = useMolcule(CounterMolecule, props);
+const counter = useMolecule(CounterMolecule, props);
 const count = useMutableSignal(counter.count);
 
 const increment = () => counter.increment();
