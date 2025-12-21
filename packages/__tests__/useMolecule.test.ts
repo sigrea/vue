@@ -9,25 +9,25 @@ import {
 	onUnmount,
 } from "@sigrea/core";
 
-import { useMolcule } from "../useMolcule";
+import { useMolecule } from "../useMolecule";
 import { flushEffects } from "./testUtils";
 
-describe("useMolcule", () => {
+describe("useMolecule", () => {
 	afterEach(() => {
 		disposeTrackedMolecules();
 	});
 
 	it("throws when invoked without an active component instance", () => {
-		const counterMolcule = molecule(() => ({}));
+		const counterMolecule = molecule(() => ({}));
 
-		expect(() => useMolcule(counterMolcule)).toThrow(
-			"useMolcule can only be used within a Vue component setup().",
+		expect(() => useMolecule(counterMolecule)).toThrow(
+			"useMolecule can only be used within a Vue component setup().",
 		);
 	});
 
 	it("mounts molecule and disposes it alongside the component", async () => {
 		const cleanups = vi.fn();
-		const counterMolcule = molecule((value: number) => {
+		const counterMolecule = molecule((value: number) => {
 			onUnmount(() => cleanups(value));
 			return { value };
 		});
@@ -36,7 +36,7 @@ describe("useMolcule", () => {
 
 		const wrapper = mount(
 			defineComponent(() => {
-				const instance = useMolcule(counterMolcule, 1);
+				const instance = useMolecule(counterMolecule, 1);
 				observed.push(instance);
 				return () => null;
 			}),

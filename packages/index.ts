@@ -4,7 +4,7 @@
  * ==================================================
  */
 
-export { useMolcule } from "./useMolcule";
+export { useMolecule } from "./useMolecule";
 
 /**
  * ==================================================
