@@ -1,27 +1,33 @@
-import { molecule, onMount, onUnmount, signal, watch } from "@sigrea/core";
+import { molecule, onMount, onUnmount, readonly, signal, watch } from "@sigrea/core";
 
 export interface CounterProps {
-	initialCount?: number;
-	step?: number;
+	initialCount: number;
+	initialStep: number;
 }
 
 export const CounterMolecule = molecule((props: CounterProps) => {
-	const { initialCount, step } = props;
-	const initial = initialCount ?? 0;
-	const incrementStep = step ?? 1;
-	const count = signal(initial);
+	const count = signal(props.initialCount);
+	const step = signal(props.initialStep);
 
-	const increment = () => {
-		count.value += incrementStep;
-	};
+	function setCount(next: number) {
+		count.value = next;
+	}
 
-	const decrement = () => {
-		count.value -= incrementStep;
-	};
+	function setStep(next: number) {
+		step.value = next;
+	}
 
-	const reset = () => {
-		count.value = initial;
-	};
+	function increment() {
+		count.value += step.value;
+	}
+
+	function decrement() {
+		count.value -= step.value;
+	}
+
+	function reset() {
+		count.value = props.initialCount;
+	}
 
 	onMount(() => {
 		console.log("onMount");
@@ -36,8 +42,15 @@ export const CounterMolecule = molecule((props: CounterProps) => {
 		(value) => {
 			console.log(`new count value: ${value}`);
 		},
-		{ immediate: false },
 	);
 
-	return { count, increment, decrement, reset };
+	return {
+		count: readonly(count),
+		step: readonly(step),
+		setCount,
+		setStep,
+		increment,
+		decrement,
+		reset,
+	};
 });

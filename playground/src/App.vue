@@ -1,27 +1,22 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import Counter from "./Counter.vue";
 
 const showCounter = ref(true);
 const initialCount = ref(0);
-const step = ref(1);
-
-const counterKey = computed(
-	() =>
-		`${initialCount.value}:${step.value}:${showCounter.value ? "on" : "off"}`,
-);
+const initialStep = ref(1);
 
 const toggle = () => {
 	showCounter.value = !showCounter.value;
 };
 
-const updateInitial = (value: number) => {
+const updateInitialCount = (value: number) => {
 	initialCount.value = value;
 };
 
-const updateStep = (value: number) => {
-	step.value = value <= 0 ? 1 : value;
+const updateInitialStep = (value: number) => {
+	initialStep.value = value <= 0 ? 1 : value;
 };
 </script>
 
@@ -44,16 +39,18 @@ const updateStep = (value: number) => {
 						<input
 							type="number"
 							:value="initialCount"
-							@input="updateInitial(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 0)"
+							:disabled="showCounter"
+							@input="updateInitialCount(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 0)"
 						/>
 					</label>
 					<label class="playground__input">
-						<span>Step</span>
+						<span>Initial step</span>
 						<input
 							type="number"
 							min="1"
-							:value="step"
-							@input="updateStep(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 1)"
+							:value="initialStep"
+							:disabled="showCounter"
+							@input="updateInitialStep(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 1)"
 						/>
 					</label>
 				</div>
@@ -62,9 +59,8 @@ const updateStep = (value: number) => {
 			<section class="playground__canvas">
 				<Counter
 					v-if="showCounter"
-					:key="counterKey"
 					:initial-count="initialCount"
-					:step="step"
+					:initial-step="initialStep"
 				/>
 				<div v-else class="playground__placeholder">
 					Counter is currently unmounted.
