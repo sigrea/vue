@@ -1,4 +1,4 @@
-import { getCurrentInstance, onScopeDispose } from "vue";
+import { getCurrentInstance, onScopeDispose, toRaw } from "vue";
 
 import type {
 	MoleculeArgs,
@@ -7,7 +7,10 @@ import type {
 } from "@sigrea/core";
 import { disposeMolecule } from "@sigrea/core";
 
-export function useMolecule<TReturn extends object, TProps = void>(
+export function useMolecule<
+	TReturn extends object,
+	TProps extends object | void = void,
+>(
 	molecule: MoleculeFactory<TReturn, TProps>,
 	...args: MoleculeArgs<TProps>
 ): MoleculeInstance<TReturn> {
@@ -17,7 +20,22 @@ export function useMolecule<TReturn extends object, TProps = void>(
 		);
 	}
 
-	const instance = molecule(...args);
+	const props = args.length === 0 ? undefined : (args[0] as TProps | undefined);
+
+	if (props !== undefined && (typeof props !== "object" || props === null)) {
+		throw new TypeError("useMolecule props must be an object.");
+	}
+
+	const snapshot =
+		props === undefined
+			? undefined
+			: ({ ...toRaw(props) } as Exclude<TProps, void>);
+	const moleculeArgs =
+		snapshot === undefined
+			? ([] as MoleculeArgs<TProps>)
+			: ([snapshot as TProps] as MoleculeArgs<TProps>);
+
+	const instance = molecule(...moleculeArgs);
 
 	onScopeDispose(() => {
 		disposeMolecule(instance);
