@@ -1,4 +1,11 @@
-import { molecule, onMount, onUnmount, readonly, signal, watch } from "@sigrea/core";
+import {
+	molecule,
+	onMount,
+	onUnmount,
+	readonly,
+	signal,
+	watch,
+} from "@sigrea/core";
 
 export interface CounterProps {
 	initialCount: number;
