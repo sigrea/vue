@@ -1,11 +1,19 @@
-import { getCurrentInstance, onScopeDispose, toRaw } from "vue";
+import {
+	getCurrentInstance,
+	onActivated,
+	onBeforeUnmount,
+	onDeactivated,
+	onMounted,
+	onScopeDispose,
+	toRaw,
+} from "vue";
 
 import type {
 	MoleculeArgs,
 	MoleculeFactory,
 	MoleculeInstance,
 } from "@sigrea/core";
-import { disposeMolecule } from "@sigrea/core";
+import { disposeMolecule, mountMolecule, unmountMolecule } from "@sigrea/core";
 
 export function useMolecule<
 	TReturn extends object,
@@ -36,6 +44,22 @@ export function useMolecule<
 			: ([snapshot as TProps] as MoleculeArgs<TProps>);
 
 	const instance = molecule(...moleculeArgs);
+
+	onMounted(() => {
+		mountMolecule(instance);
+	});
+
+	onActivated(() => {
+		mountMolecule(instance);
+	});
+
+	onDeactivated(() => {
+		unmountMolecule(instance);
+	});
+
+	onBeforeUnmount(() => {
+		unmountMolecule(instance);
+	});
 
 	onScopeDispose(() => {
 		disposeMolecule(instance);
