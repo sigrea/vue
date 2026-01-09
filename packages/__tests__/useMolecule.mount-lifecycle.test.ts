@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { defineComponent } from "vue";
 
 import {
+	type MoleculeInstance,
+	type Signal,
 	disposeTrackedMolecules,
 	molecule,
 	onMount,
@@ -89,11 +91,12 @@ describe("useMolecule mount lifecycle", () => {
 			return { count };
 		});
 
-		let instance: { count: { value: number } } | undefined;
+		const observed: Array<MoleculeInstance<{ count: Signal<number> }>> = [];
 
 		const wrapper = mount(
 			defineComponent(() => {
-				instance = useMolecule(testMolecule);
+				const instance = useMolecule(testMolecule);
+				observed.push(instance);
 				return () => null;
 			}),
 		);
@@ -101,12 +104,9 @@ describe("useMolecule mount lifecycle", () => {
 		await flushEffects();
 
 		expect(watchCallback).not.toHaveBeenCalled();
+		expect(observed).toHaveLength(1);
 
-		if (instance === undefined) {
-			throw new Error("Failed to capture instance");
-		}
-
-		instance.count.value = 42;
+		observed[0].count.value = 42;
 		await flushEffects();
 
 		expect(watchCallback).toHaveBeenCalledTimes(1);
