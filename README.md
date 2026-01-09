@@ -57,20 +57,36 @@ const value = useSignal(count);
 
 ```ts
 // CounterMolecule.ts
-import { molecule, signal } from "@sigrea/core";
+import { molecule, readonly, signal } from "@sigrea/core";
 
-export const CounterMolecule = molecule((props: { initialCount: number }) => {
+type CounterProps = {
+  initialCount: number;
+  initialStep: number;
+};
+
+export const CounterMolecule = molecule((props: CounterProps) => {
   const count = signal(props.initialCount);
+  const step = signal(props.initialStep);
 
-  const increment = () => {
-    count.value += 1;
-  };
+  function setStep(next: number) {
+    step.value = next;
+  }
 
-  const reset = () => {
+  function increment() {
+    count.value += step.value;
+  }
+
+  function reset() {
     count.value = props.initialCount;
-  };
+  }
 
-  return { count, increment, reset };
+  return {
+    count: readonly(count),
+    step: readonly(step),
+    setStep,
+    increment,
+    reset,
+  };
 });
 ```
 
@@ -80,16 +96,23 @@ export const CounterMolecule = molecule((props: { initialCount: number }) => {
 import { useMolecule, useSignal } from "@sigrea/vue";
 import { CounterMolecule } from "./CounterMolecule";
 
-const props = defineProps<{ initialCount: number }>();
-const counter = useMolecule(CounterMolecule, props);
-const value = useSignal(counter.count);
+const props = defineProps<{ initialCount: number; initialStep: number }>();
+
+const counter = useMolecule(CounterMolecule, {
+  initialCount: props.initialCount,
+  initialStep: props.initialStep,
+});
+
+const count = useSignal(counter.count);
+const step = useSignal(counter.step);
 </script>
 
 <template>
   <div>
-    <span>{{ value }}</span>
+    <span>{{ count }}</span>
     <button @click="counter.increment">Increment</button>
     <button @click="counter.reset">Reset</button>
+    <button @click="counter.setStep(step + 1)">Step +</button>
   </div>
 </template>
 ```
@@ -122,7 +145,7 @@ const model = useMutableSignal(count);
 import { deepSignal } from "@sigrea/core";
 import { useDeepSignal } from "@sigrea/vue";
 
-const profile = deepSignal({ name: "Sigrea" });
+const profile = deepSignal({ name: "Mendako" });
 const model = useDeepSignal(profile);
 </script>
 
@@ -173,13 +196,27 @@ Wraps a Sigrea signal as a Vue `WritableComputedRef` for two-way bindings like `
 ### useMolecule
 
 ```ts
-function useMolecule<TReturn extends object, TProps = void>(
+function useMolecule<TReturn extends object, TProps extends object | void = void>(
   molecule: MoleculeFactory<TReturn, TProps>,
   ...args: MoleculeArgs<TProps>
 ): MoleculeInstance<TReturn>
 ```
 
 Mounts a molecule factory and returns its MoleculeInstance. Sigrea augments the molecule with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
+
+**KeepAlive Support**
+
+When used inside Vue's `<KeepAlive>`, molecule side effects are automatically managed for optimal resource efficiency:
+
+- **On deactivation** (`onDeactivated`): `watch` effects and ongoing work are paused via `unmountMolecule`. The molecule instance itself remains alive, preserving its internal state.
+- **On reactivation** (`onActivated`): Side effects resume via `mountMolecule`, allowing watches and subscriptions to pick up where they left off.
+- **On final unmount**: The molecule is fully disposed via `disposeMolecule`, releasing all resources.
+
+This design prevents unnecessary computation and subscriptions while components are cached but invisible, reducing CPU and memory usage without losing state.
+
+**Props Handling**
+
+Props are treated as an initial snapshot. Updating component props does not recreate the molecule instance or update the snapshot; model dynamic values via signals or explicit molecule methods (for example, `setStep`).
 
 ## Testing
 

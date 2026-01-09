@@ -7,14 +7,13 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@sigrea/core':
-        specifier: ^0.4.3
-        version: 0.4.3
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
+      '@sigrea/core':
+        specifier: ^0.5.0
+        version: 0.5.0
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.2.4(vite@5.4.21)(vue@3.5.22(typescript@5.9.3))
@@ -24,6 +23,9 @@ importers:
       '@vue/test-utils':
         specifier: ^2.4.0
         version: 2.4.6
+      baseline-browser-mapping:
+        specifier: ^2.9.13
+        version: 2.9.13
       changelogen:
         specifier: ^0.6.2
         version: 0.6.2(magicast@0.3.5)
@@ -653,8 +655,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sigrea/core@0.4.3':
-    resolution: {integrity: sha512-3jB26ZIkPrYDW0gwGT6FIObuXtA8Q/9pKpEmUVHPpmfa1ut0pMq7e5DP5an4sEoohsjiU1H4//Eu6+SvWiE1Aw==}
+  '@sigrea/core@0.5.0':
+    resolution: {integrity: sha512-wDZSwlmjwFLK8Zofd9jIWEMUNEyTxAhlAiuktoZWnyuw/3m5cClt79tFggk4bCzsLTN/d/fSoU4lvPew2p72iA==}
     engines: {node: '>=20'}
 
   '@types/chai@5.2.3':
@@ -798,8 +800,8 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  baseline-browser-mapping@2.8.20:
-    resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
+  baseline-browser-mapping@2.9.13:
+    resolution: {integrity: sha512-WhtvB2NG2wjr04+h77sg3klAIwrgOqnjS49GGudnUPGFFgg7G17y7Qecqp+2Dr5kUDxNRBca0SK7cG8JwzkWDQ==}
     hasBin: true
 
   boolbase@1.0.0:
@@ -2422,7 +2424,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
-  '@sigrea/core@0.4.3':
+  '@sigrea/core@0.5.0':
     dependencies:
       alien-signals: 3.1.1
 
@@ -2602,7 +2604,7 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  baseline-browser-mapping@2.8.20: {}
+  baseline-browser-mapping@2.9.13: {}
 
   boolbase@1.0.0: {}
 
@@ -2612,7 +2614,7 @@ snapshots:
 
   browserslist@4.27.0:
     dependencies:
-      baseline-browser-mapping: 2.8.20
+      baseline-browser-mapping: 2.9.13
       caniuse-lite: 1.0.30001751
       electron-to-chromium: 1.5.240
       node-releases: 2.0.26
