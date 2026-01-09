@@ -1,5 +1,22 @@
 # @sigrea/vue
 
+## v0.5.0
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.4.0...v0.5.0)
+
+### 🚀 Enhancements
+
+- Integrate @sigrea/core v0.5.0 mount lifecycle ([#15](https://github.com/sigrea/vue/pull/15))
+
+### 🏡 Chore
+
+- Add release_major task to mise.toml ([2992ff6](https://github.com/sigrea/vue/commit/2992ff6))
+
+### ❤️ Contributors
+
+- Aose-yuu <aose.developer@gmail.com>
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+
 ## v0.4.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.3.1...v0.4.0)
