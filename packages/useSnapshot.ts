@@ -8,6 +8,7 @@ import {
 import type { DeepReadonly, ShallowRef } from "vue";
 
 import type { SnapshotHandler } from "@sigrea/core";
+import { registerSsrCleanup } from "./ssrCleanup";
 
 export interface UseSnapshotOptions {
 	mode?: "readonly" | "mutable";
@@ -42,9 +43,20 @@ export function useSnapshot<T>(
 	};
 
 	const unsubscribe = handler.subscribe(update);
+	const unsubscribeState = { active: true };
+
+	const cleanup = () => {
+		if (!unsubscribeState.active) {
+			return;
+		}
+
+		unsubscribeState.active = false;
+		unsubscribe();
+	};
+	registerSsrCleanup(cleanup);
 
 	onScopeDispose(() => {
-		unsubscribe();
+		cleanup();
 	});
 
 	if (options?.mode === "mutable") {
