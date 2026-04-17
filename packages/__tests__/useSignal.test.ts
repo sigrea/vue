@@ -2,7 +2,7 @@ import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { defineComponent, h } from "vue";
 
-import { readonly, signal } from "@sigrea/core";
+import { computed as createComputed, readonly, signal } from "@sigrea/core";
 
 import { useSignal } from "../useSignal";
 import { flushEffects } from "./testUtils";
@@ -25,6 +25,27 @@ describe("useSignal", () => {
 		await flushEffects();
 
 		expect(wrapper.text()).toBe("1");
+
+		await wrapper.unmount();
+	});
+
+	it("reflects updates from computed sources", async () => {
+		const count = signal(2);
+		const doubled = createComputed(() => count.value * 2);
+
+		const wrapper = mount(
+			defineComponent(() => {
+				const value = useSignal(doubled);
+				return () => h("span", value.value);
+			}),
+		);
+
+		expect(wrapper.text()).toBe("4");
+
+		count.value = 3;
+		await flushEffects();
+
+		expect(wrapper.text()).toBe("6");
 
 		await wrapper.unmount();
 	});
