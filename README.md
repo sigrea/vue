@@ -163,11 +163,11 @@ const model = useDeepSignal(profile);
 
 ```ts
 function useSignal<T>(
-  signal: Signal<T> | ReadonlySignal<T>
+  signal: Signal<T> | ReadonlySignal<T> | Computed<T>
 ): DeepReadonly<ShallowRef<T>>
 ```
 
-Subscribes to a signal or computed value and returns a readonly Vue ref that updates when the signal changes. The subscription is cleaned up when the component unmounts.
+Subscribes to a signal or computed value and returns a readonly Vue ref that updates when the signal changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes.
 
 ### useComputed
 
@@ -175,7 +175,7 @@ Subscribes to a signal or computed value and returns a readonly Vue ref that upd
 function useComputed<T>(source: Computed<T>): DeepReadonly<ShallowRef<T>>
 ```
 
-Subscribes to a computed value and returns a readonly Vue ref that updates when the computed value changes. The subscription is cleaned up when the component unmounts.
+Subscribes to a computed value and returns a readonly Vue ref that updates when the computed value changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes.
 
 ### useDeepSignal
 
@@ -183,7 +183,7 @@ Subscribes to a computed value and returns a readonly Vue ref that updates when 
 function useDeepSignal<T extends object>(signal: DeepSignal<T>): ShallowRef<T>
 ```
 
-Subscribes to a deep signal and returns a mutable Vue ref. Updates to the deep signal trigger reactivity, and the subscription is cleaned up when the component unmounts. Templates unwrap the ref automatically, so accessing nested properties requires no `.value`. In script blocks, use `state.value` to access the underlying object.
+Subscribes to a deep signal and returns a mutable Vue ref. Updates to the deep signal trigger reactivity, and the subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes. Templates unwrap the ref automatically, so accessing nested properties requires no `.value`. In script blocks, use `state.value` to access the underlying object.
 
 ### useMutableSignal
 
@@ -203,6 +203,10 @@ function useMolecule<TReturn extends object, TProps extends object | void = void
 ```
 
 Mounts a molecule factory and returns its MoleculeInstance. Sigrea augments the molecule with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
+
+**Server Rendering**
+
+During server rendering, `useMolecule` creates the molecule instance for the render pass but does not mount it. `onMount`, `watch`, `watchEffect`, `onActivated`, and `onDeactivated` do not run on the server. Unmounted instances created during SSR are disposed automatically in a microtask after server rendering, including any `onServerPrefetch()` work, completes.
 
 **KeepAlive Support**
 

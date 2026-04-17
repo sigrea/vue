@@ -14,6 +14,7 @@ import type {
 	MoleculeInstance,
 } from "@sigrea/core";
 import { disposeMolecule, mountMolecule, unmountMolecule } from "@sigrea/core";
+import { registerSsrCleanup } from "./ssrCleanup";
 
 export function useMolecule<
 	TReturn extends object,
@@ -44,6 +45,17 @@ export function useMolecule<
 			: ([snapshot as TProps] as MoleculeArgs<TProps>);
 
 	const instance = molecule(...moleculeArgs);
+	const disposeState = { disposed: false };
+
+	const dispose = () => {
+		if (disposeState.disposed) {
+			return;
+		}
+
+		disposeState.disposed = true;
+		disposeMolecule(instance);
+	};
+	registerSsrCleanup(dispose);
 
 	onMounted(() => {
 		mountMolecule(instance);
@@ -62,7 +74,7 @@ export function useMolecule<
 	});
 
 	onScopeDispose(() => {
-		disposeMolecule(instance);
+		dispose();
 	});
 
 	return instance;

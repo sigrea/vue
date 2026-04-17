@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { defineComponent } from "vue";
+import { KeepAlive, defineComponent, h, ref } from "vue";
 
 import {
 	type MoleculeInstance,
@@ -8,6 +8,7 @@ import {
 	disposeTrackedMolecules,
 	molecule,
 	onMount,
+	onUnmount,
 	signal,
 	watch,
 } from "@sigrea/core";
@@ -113,5 +114,60 @@ describe("useMolecule mount lifecycle", () => {
 		expect(watchCallback).toHaveBeenCalledWith(42);
 
 		await wrapper.unmount();
+	});
+
+	it("replays lifecycle callbacks through KeepAlive activation", async () => {
+		const onMountCallback = vi.fn();
+		const onUnmountCallback = vi.fn();
+		const activeChild = ref(true);
+
+		const testMolecule = molecule(() => {
+			onMount(() => {
+				onMountCallback();
+			});
+			onUnmount(() => {
+				onUnmountCallback();
+			});
+			return {};
+		});
+
+		const Child = defineComponent(() => {
+			useMolecule(testMolecule);
+			return () => h("span", "child");
+		});
+
+		const Alternate = defineComponent(() => {
+			return () => h("div", "alternate");
+		});
+
+		const wrapper = mount(
+			defineComponent(() => {
+				return () =>
+					h(KeepAlive, null, [activeChild.value ? h(Child) : h(Alternate)]);
+			}),
+		);
+
+		await flushEffects(2);
+
+		expect(onMountCallback).toHaveBeenCalledTimes(1);
+		expect(onUnmountCallback).not.toHaveBeenCalled();
+
+		activeChild.value = false;
+		await flushEffects(2);
+
+		expect(onMountCallback).toHaveBeenCalledTimes(1);
+		expect(onUnmountCallback).toHaveBeenCalledTimes(1);
+
+		activeChild.value = true;
+		await flushEffects(2);
+
+		expect(onMountCallback).toHaveBeenCalledTimes(2);
+		expect(onUnmountCallback).toHaveBeenCalledTimes(1);
+
+		await wrapper.unmount();
+		await flushEffects(2);
+
+		expect(onMountCallback).toHaveBeenCalledTimes(2);
+		expect(onUnmountCallback).toHaveBeenCalledTimes(2);
 	});
 });
