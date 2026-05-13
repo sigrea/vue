@@ -1,5 +1,24 @@
 # @sigrea/vue
 
+## v0.6.0
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.5.0...v0.6.0)
+
+### 🩹 Fixes
+
+- Auto-format package.json after changelogen in release tasks ([862e8ac](https://github.com/sigrea/vue/commit/862e8ac))
+- Tighten Vue SSR cleanup behavior ([#16](https://github.com/sigrea/vue/pull/16))
+
+### 🏡 Chore
+
+- Fix package.json formatting ([050b2d2](https://github.com/sigrea/vue/commit/050b2d2))
+- Require core 0.6 and Node 24 for Vue ([#17](https://github.com/sigrea/vue/pull/17))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+- Aose-yuu <aose.developer@gmail.com>
+
 ## v0.5.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.4.0...v0.5.0)
