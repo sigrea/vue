@@ -33,7 +33,7 @@
 npm install @sigrea/vue @sigrea/core vue
 ```
 
-Requires Vue 3.4+ and Node.js 20 or later.
+Requires Vue 3.4+ and Node.js 24 or later.
 
 ## Quick Start
 
@@ -268,7 +268,7 @@ createApp(App).mount("#app");
 
 ## Development
 
-This repo targets Node.js 20 or later.
+This repo targets Node.js 24 or later.
 
 If you use mise:
 
