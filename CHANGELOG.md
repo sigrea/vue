@@ -1,5 +1,17 @@
 # @sigrea/vue
 
+## v0.6.1
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.6.0...v0.6.1)
+
+### 🏡 Chore
+
+- Add Vue package support files ([#18](https://github.com/sigrea/vue/pull/18))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+
 ## v0.6.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.5.0...v0.6.0)
