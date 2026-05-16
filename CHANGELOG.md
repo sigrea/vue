@@ -1,5 +1,17 @@
 # @sigrea/vue
 
+## v0.7.0
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.6.1...v0.7.0)
+
+### 🚀 Enhancements
+
+- Support Vue live molecule props ([#19](https://github.com/sigrea/vue/pull/19))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+
 ## v0.6.1
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.6.0...v0.6.1)

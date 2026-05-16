@@ -1,6 +1,6 @@
 {
 	"name": "@sigrea/vue",
-	"version": "0.6.1",
+	"version": "0.7.0",
 	"description": "Vue adapter bindings for Sigrea molecule modules.",
 	"license": "MIT",
 	"type": "module",
