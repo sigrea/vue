@@ -35,14 +35,14 @@
 		"dev": "vite --config playground/vite.config.ts",
 		"build": "unbuild",
 		"prepack": "unbuild",
+		"smoke": "node --input-type=module -e \"const mod = await import('@sigrea/vue'); for (const key of ['useMolecule', 'useSignal']) { if (typeof mod[key] !== 'function') throw new Error(key + ' export is missing'); }\" && node -e \"const mod = require('@sigrea/vue'); for (const key of ['useMolecule', 'useSignal']) { if (typeof mod[key] !== 'function') throw new Error(key + ' export is missing'); }\"",
 		"changelog": "changelogen",
-		"release": "pnpm test && pnpm build && changelogen --release",
 		"test": "vitest run",
 		"test:coverage": "vitest --coverage",
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"format": "biome check .",
 		"format:fix": "biome check --write .",
-		"cicheck": "pnpm test && pnpm typecheck && pnpm format:fix"
+		"cicheck": "pnpm -s test && pnpm -s typecheck && pnpm -s build && pnpm -s smoke && pnpm -s format"
 	},
 	"peerDependencies": {
 		"@sigrea/core": "^0.7.0",
