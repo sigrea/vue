@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 import {
 	type MoleculeInstance,
@@ -53,7 +53,7 @@ describe("useMolecule", () => {
 		expect(cleanups).toHaveBeenCalledWith(1);
 	});
 
-	it("passes a snapshot of props and does not react to prop updates", async () => {
+	it("passes a snapshot of object props and does not react to prop updates", async () => {
 		const counterMolecule = molecule((props: { value: number }) => {
 			const count = signal(props.value);
 
@@ -103,5 +103,103 @@ describe("useMolecule", () => {
 		expect(instance.count.value).toBe(1);
 
 		await wrapper.unmount();
+	});
+
+	it("tracks a props getter for derived molecule props", async () => {
+		const counterMolecule = molecule((props: { value: number }) => {
+			const count = signal(props.value);
+			const reset = () => {
+				count.value = props.value;
+			};
+
+			return { count, reset };
+		});
+
+		let instance:
+			| MoleculeInstance<{ count: { value: number }; reset: () => void }>
+			| undefined;
+
+		const wrapper = mount(
+			defineComponent({
+				props: {
+					value: { type: Number, required: true },
+				},
+				setup(props) {
+					instance = useMolecule(counterMolecule, () => ({
+						value: props.value * 2,
+					}));
+					return () => null;
+				},
+			}),
+			{
+				props: {
+					value: 1,
+				},
+			},
+		);
+
+		await flushEffects();
+
+		if (instance === undefined) {
+			throw new Error("Failed to capture molecule instance.");
+		}
+
+		instance.count.value = 0;
+		instance.reset();
+		expect(instance.count.value).toBe(2);
+
+		await wrapper.setProps({ value: 3 });
+		await flushEffects();
+
+		instance.count.value = 0;
+		instance.reset();
+		expect(instance.count.value).toBe(6);
+
+		await wrapper.unmount();
+	});
+
+	it("stops props getter sync after scope disposal", async () => {
+		const counterMolecule = molecule((props: { value: number }) => {
+			const count = signal(props.value);
+			const reset = () => {
+				count.value = props.value;
+			};
+
+			return { count, reset };
+		});
+
+		const source = ref(1);
+		let instance:
+			| MoleculeInstance<{ count: { value: number }; reset: () => void }>
+			| undefined;
+
+		const wrapper = mount(
+			defineComponent(() => {
+				instance = useMolecule(counterMolecule, () => ({
+					value: source.value,
+				}));
+				return () => null;
+			}),
+		);
+
+		await flushEffects();
+
+		if (instance === undefined) {
+			throw new Error("Failed to capture molecule instance.");
+		}
+
+		source.value = 2;
+		await flushEffects();
+		instance.count.value = 0;
+		instance.reset();
+		expect(instance.count.value).toBe(2);
+
+		await wrapper.unmount();
+
+		source.value = 3;
+		await flushEffects();
+		instance.count.value = 0;
+		instance.reset();
+		expect(instance.count.value).toBe(2);
 	});
 });
