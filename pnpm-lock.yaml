@@ -12,8 +12,8 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@sigrea/core':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.2.4(vite@5.4.21)(vue@3.5.22(typescript@5.9.3))
@@ -655,8 +655,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sigrea/core@0.6.0':
-    resolution: {integrity: sha512-0zofSNihnmFiJ+4MNh6EvWo96bvpCMeTuNAaAx/X1bmosQZ2zztXRS7iEAqHX604cucEIahNBD54Babw5598ug==}
+  '@sigrea/core@0.7.0':
+    resolution: {integrity: sha512-9fEK8lje0svrcguy94vLfbID1ZZCnxL63o0fVEf+as2jp0EyeE2CGjvPq18BueHp53QxwsdTdnA3ELhPw4O/OQ==}
     engines: {node: '>=24'}
 
   '@types/chai@5.2.3':
@@ -2424,7 +2424,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
-  '@sigrea/core@0.6.0':
+  '@sigrea/core@0.7.0':
     dependencies:
       alien-signals: 3.1.1
 
