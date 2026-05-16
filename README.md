@@ -82,18 +82,16 @@ type DialogEvents = {
 export const DialogMolecule = molecule<DialogProps>((props) => {
   const { send, on } = createEvents<DialogEvents>();
   const isOpen = toSignal(props, "open");
-  const disabled = computed(() => props.disabled ?? false);
+  const isDisabled = computed(() => props.disabled ?? false);
 
   const requestOpenChange = async (next: boolean) => {
-    if (disabled.value) {
+    if (isDisabled.value || isOpen.value === next) {
       return;
     }
     await send("update:open", next);
   };
 
   return {
-    disabled,
-    isOpen,
     on,
     requestOpenChange,
   };
