@@ -33,6 +33,9 @@
 npm install @sigrea/vue @sigrea/core vue
 ```
 
+Install `@sigrea/use` as well when shared molecules use utilities such as
+`createEvents`.
+
 Requires Vue 3.4+ and Node.js 24 or later.
 
 ## Quick Start
@@ -56,64 +59,77 @@ const value = useSignal(count);
 ### Bridge Framework-Agnostic Molecules
 
 ```ts
-// CounterMolecule.ts
-import { molecule, readonly, signal } from "@sigrea/core";
+// DialogMolecule.ts
+import {
+  computed,
+  get,
+  molecule,
+  readonly,
+  signal,
+  toSignal,
+} from "@sigrea/core";
+import { createEvents } from "@sigrea/use";
 
-type CounterProps = {
-  initialCount: number;
-  initialStep: number;
+type DialogProps = {
+  open: boolean;
+  disabled?: boolean;
 };
 
-export const CounterMolecule = molecule((props: CounterProps) => {
-  const count = signal(props.initialCount);
-  const step = signal(props.initialStep);
+type DialogEvents = {
+  "update:open": [open: boolean];
+};
 
-  function setStep(next: number) {
-    step.value = next;
-  }
+export const DialogMolecule = molecule<DialogProps>((props) => {
+  const { send, on } = createEvents<DialogEvents>();
+  const open = toSignal(props, "open");
+  const disabled = computed(() => props.disabled ?? false);
 
-  function increment() {
-    count.value += step.value;
-  }
-
-  function reset() {
-    count.value = props.initialCount;
-  }
+  const requestOpenChange = async (nextOpen: boolean) => {
+    if (disabled.value) {
+      return;
+    }
+    await send("update:open", nextOpen);
+  };
 
   return {
-    count: readonly(count),
-    step: readonly(step),
-    setStep,
-    increment,
-    reset,
+    disabled,
+    on,
+    open,
+    requestOpenChange,
+  };
+});
+
+export const DialogControllerMolecule = molecule(() => {
+  const open = signal(false);
+  const dialog = get(DialogMolecule, () => ({
+    open: open.value,
+  }));
+
+  dialog.on("update:open", (nextOpen) => {
+    open.value = nextOpen;
+  });
+
+  return {
+    open: readonly(open),
+    requestOpenChange: dialog.requestOpenChange,
   };
 });
 ```
 
 ```vue
-<!-- Counter.vue -->
+<!-- DialogButton.vue -->
 <script setup lang="ts">
 import { useMolecule, useSignal } from "@sigrea/vue";
-import { CounterMolecule } from "./CounterMolecule";
+import { DialogControllerMolecule } from "./DialogMolecule";
 
-const props = defineProps<{ initialCount: number; initialStep: number }>();
-
-const counter = useMolecule(CounterMolecule, {
-  initialCount: props.initialCount,
-  initialStep: props.initialStep,
-});
-
-const count = useSignal(counter.count);
-const step = useSignal(counter.step);
+const dialog = useMolecule(DialogControllerMolecule);
+const open = useSignal(dialog.open);
 </script>
 
 <template>
-  <div>
-    <span>{{ count }}</span>
-    <button @click="counter.increment">Increment</button>
-    <button @click="counter.reset">Reset</button>
-    <button @click="counter.setStep(step + 1)">Step +</button>
-  </div>
+  <button @click="dialog.requestOpenChange(!open)">
+    {{ open ? "Close" : "Open" }}
+  </button>
 </template>
 ```
 
@@ -167,7 +183,9 @@ function useSignal<T>(
 ): DeepReadonly<ShallowRef<T>>
 ```
 
-Subscribes to a signal or computed value and returns a readonly Vue ref that updates when the signal changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes.
+Subscribes to a signal or computed value and returns a readonly Vue ref that updates when the signal changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes. Templates unwrap the ref automatically. In script blocks, access the current value with `value.value`.
+
+Unlike the React adapter, this hook returns a readonly ref rather than the unwrapped value.
 
 ### useComputed
 
@@ -198,8 +216,8 @@ Wraps a Sigrea signal as a Vue `WritableComputedRef` for two-way bindings like `
 ```ts
 function useMolecule<TReturn extends object, TProps extends object | void = void>(
   molecule: MoleculeFactory<TReturn, TProps>,
-  ...args: MoleculeArgs<TProps>
-): MoleculeInstance<TReturn>
+  ...args: MoleculeGetArgs<TProps>
+): MoleculeInstance<TReturn, TProps>
 ```
 
 Mounts a molecule factory and returns its MoleculeInstance. Sigrea augments the molecule with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
@@ -210,17 +228,32 @@ During server rendering, `useMolecule` creates the molecule instance for the ren
 
 **KeepAlive Support**
 
-When used inside Vue's `<KeepAlive>`, molecule side effects are automatically managed for optimal resource efficiency:
+When used inside Vue's `<KeepAlive>`, `useMolecule` pauses molecule mount-scope
+work while a component is cached and resumes it on reactivation:
 
 - **On deactivation** (`onDeactivated`): `watch` effects and ongoing work are paused via `unmountMolecule`. The molecule instance itself remains alive, preserving its internal state.
 - **On reactivation** (`onActivated`): Side effects resume via `mountMolecule`, allowing watches and subscriptions to pick up where they left off.
 - **On final unmount**: The molecule is fully disposed via `disposeMolecule`, releasing all resources.
 
-This design prevents unnecessary computation and subscriptions while components are cached but invisible, reducing CPU and memory usage without losing state.
+`unmountMolecule`, `mountMolecule`, and `disposeMolecule` are called internally
+by `useMolecule`. This prevents unnecessary molecule-side work while components
+are cached but invisible, without losing molecule state. Adapter-level live
+props sync created from a props getter remains active until final disposal.
 
 **Props Handling**
 
-Props are treated as an initial snapshot. Updating component props does not recreate the molecule instance or update the snapshot; model dynamic values via signals or explicit molecule methods (for example, `setStep`).
+`useMolecule` keeps the same molecule instance while the factory stays the same.
+Passing a props object directly creates an initial snapshot. Passing a props
+getter, such as `() => ({ open: props.open })` or `() => props`, syncs
+top-level props into the instance through Vue's `watchEffect`. Inside a
+molecule, read props as `props.name`; destructuring copies the current value and
+loses reactivity.
+
+Controller molecules handle `update:open`, `update:value`, and similar events
+from child molecules. Vue components mount the controller molecule and read its
+returned signals. If a UI wrapper needs to expose `v-model`, bridge it at the
+wrapper boundary using Vue's component API. Components should not subscribe to
+raw molecule events directly.
 
 ## Testing
 
