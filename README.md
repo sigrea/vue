@@ -249,6 +249,10 @@ top-level props into the instance through Vue's `watchEffect`. Inside a
 molecule, read props as `props.name`; destructuring copies the current value and
 loses reactivity.
 
+The props getter follows Vue's reactive tracking. Adapter-level props sync stays
+active until the component is finally disposed, including while a `<KeepAlive>`
+component is deactivated.
+
 Controller molecules handle `update:open`, `update:value`, and similar events
 from child molecules. Vue components mount the controller molecule and read its
 returned signals. If a UI wrapper needs to expose `v-model`, bridge it at the
@@ -306,7 +310,7 @@ This repo targets Node.js 24 or later.
 If you use mise:
 
 - `mise trust -y` — trust `mise.toml` (first run only).
-- `mise run ci` — run CI-equivalent checks locally.
+- `pnpm -s cicheck` — run CI-equivalent checks locally.
 - `mise run notes` — preview release notes (optional).
 
 You can also run pnpm scripts directly:
@@ -316,7 +320,7 @@ You can also run pnpm scripts directly:
 - `pnpm typecheck` — run TypeScript type checking.
 - `pnpm test:coverage` — collect coverage.
 - `pnpm build` — compile via unbuild to produce dual CJS/ESM bundles.
-- `pnpm cicheck` — run CI checks locally.
+- `pnpm -s cicheck` — run CI checks locally.
 - `pnpm dev` — launch the playground counter demo.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow details.
