@@ -5,6 +5,7 @@ import { KeepAlive, defineComponent, h, ref } from "vue";
 import {
 	type MoleculeInstance,
 	type Signal,
+	computed,
 	disposeTrackedMolecules,
 	molecule,
 	onMount,
@@ -169,5 +170,52 @@ describe("useMolecule mount lifecycle", () => {
 
 		expect(onMountCallback).toHaveBeenCalledTimes(2);
 		expect(onUnmountCallback).toHaveBeenCalledTimes(2);
+	});
+
+	it("keeps getter props sync active while a KeepAlive component is deactivated", async () => {
+		const activeChild = ref(true);
+		const source = ref(1);
+		const testMolecule = molecule((props: { value: number }) => {
+			return { value: computed(() => props.value) };
+		});
+		let instance: MoleculeInstance<{ value: { value: number } }> | undefined;
+
+		const Child = defineComponent(() => {
+			instance = useMolecule(testMolecule, () => ({ value: source.value }));
+			return () => h("span", "child");
+		});
+
+		const Alternate = defineComponent(() => {
+			return () => h("div", "alternate");
+		});
+
+		const wrapper = mount(
+			defineComponent(() => {
+				return () =>
+					h(KeepAlive, null, [activeChild.value ? h(Child) : h(Alternate)]);
+			}),
+		);
+
+		await flushEffects(2);
+
+		if (instance === undefined) {
+			throw new Error("Failed to capture molecule instance.");
+		}
+		expect(instance.value.value).toBe(1);
+
+		activeChild.value = false;
+		await flushEffects(2);
+
+		source.value = 2;
+		await flushEffects(2);
+
+		expect(instance.value.value).toBe(2);
+
+		activeChild.value = true;
+		await flushEffects(2);
+
+		expect(instance.value.value).toBe(2);
+
+		await wrapper.unmount();
 	});
 });

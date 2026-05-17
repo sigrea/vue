@@ -4,6 +4,7 @@ import { defineComponent, ref } from "vue";
 
 import {
 	type MoleculeInstance,
+	computed,
 	disposeTrackedMolecules,
 	molecule,
 	onUnmount,
@@ -154,6 +155,53 @@ describe("useMolecule", () => {
 		instance.count.value = 0;
 		instance.reset();
 		expect(instance.count.value).toBe(6);
+
+		await wrapper.unmount();
+	});
+
+	it("syncs top-level key removal from props getters", async () => {
+		const dialogMolecule = molecule(
+			(props: { disabled?: boolean; open: boolean }) => {
+				return {
+					disabled: computed(() => props.disabled),
+					hasDisabled: computed(() => "disabled" in props),
+				};
+			},
+		);
+
+		const disabled = ref<boolean | undefined>(true);
+		let instance:
+			| MoleculeInstance<{
+					disabled: { value: boolean | undefined };
+					hasDisabled: { value: boolean };
+			  }>
+			| undefined;
+
+		const wrapper = mount(
+			defineComponent(() => {
+				instance = useMolecule(dialogMolecule, () =>
+					disabled.value === undefined
+						? { open: true }
+						: { disabled: disabled.value, open: true },
+				);
+				return () => null;
+			}),
+		);
+
+		await flushEffects();
+
+		if (instance === undefined) {
+			throw new Error("Failed to capture molecule instance.");
+		}
+
+		expect(instance.hasDisabled.value).toBe(true);
+		expect(instance.disabled.value).toBe(true);
+
+		disabled.value = undefined;
+		await flushEffects();
+
+		expect(instance.hasDisabled.value).toBe(false);
+		expect(instance.disabled.value).toBeUndefined();
 
 		await wrapper.unmount();
 	});

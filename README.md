@@ -76,41 +76,39 @@ type DialogProps = {
 };
 
 type DialogEvents = {
-  "update:open": [open: boolean];
+  "update:open": [next: boolean];
 };
 
 export const DialogMolecule = molecule<DialogProps>((props) => {
   const { send, on } = createEvents<DialogEvents>();
-  const open = toSignal(props, "open");
-  const disabled = computed(() => props.disabled ?? false);
+  const isOpen = toSignal(props, "open");
+  const isDisabled = computed(() => props.disabled ?? false);
 
-  const requestOpenChange = async (nextOpen: boolean) => {
-    if (disabled.value) {
+  const requestOpenChange = async (next: boolean) => {
+    if (isDisabled.value || isOpen.value === next) {
       return;
     }
-    await send("update:open", nextOpen);
+    await send("update:open", next);
   };
 
   return {
-    disabled,
     on,
-    open,
     requestOpenChange,
   };
 });
 
 export const DialogControllerMolecule = molecule(() => {
-  const open = signal(false);
+  const isOpen = signal(false);
   const dialog = get(DialogMolecule, () => ({
-    open: open.value,
+    open: isOpen.value,
   }));
 
-  dialog.on("update:open", (nextOpen) => {
-    open.value = nextOpen;
+  dialog.on("update:open", (next) => {
+    isOpen.value = next;
   });
 
   return {
-    open: readonly(open),
+    isOpen: readonly(isOpen),
     requestOpenChange: dialog.requestOpenChange,
   };
 });
@@ -123,12 +121,12 @@ import { useMolecule, useSignal } from "@sigrea/vue";
 import { DialogControllerMolecule } from "./DialogMolecule";
 
 const dialog = useMolecule(DialogControllerMolecule);
-const open = useSignal(dialog.open);
+const isOpen = useSignal(dialog.isOpen);
 </script>
 
 <template>
-  <button @click="dialog.requestOpenChange(!open)">
-    {{ open ? "Close" : "Open" }}
+  <button @click="dialog.requestOpenChange(!isOpen)">
+    {{ isOpen ? "Close" : "Open" }}
   </button>
 </template>
 ```
@@ -249,6 +247,10 @@ top-level props into the instance through Vue's `watchEffect`. Inside a
 molecule, read props as `props.name`; destructuring copies the current value and
 loses reactivity.
 
+The props getter follows Vue's reactive tracking. Adapter-level props sync stays
+active until the component is finally disposed, including while a `<KeepAlive>`
+component is deactivated.
+
 Controller molecules handle `update:open`, `update:value`, and similar events
 from child molecules. Vue components mount the controller molecule and read its
 returned signals. If a UI wrapper needs to expose `v-model`, bridge it at the
@@ -306,7 +308,7 @@ This repo targets Node.js 24 or later.
 If you use mise:
 
 - `mise trust -y` — trust `mise.toml` (first run only).
-- `mise run ci` — run CI-equivalent checks locally.
+- `pnpm -s cicheck` — run CI-equivalent checks locally.
 - `mise run notes` — preview release notes (optional).
 
 You can also run pnpm scripts directly:
@@ -316,7 +318,7 @@ You can also run pnpm scripts directly:
 - `pnpm typecheck` — run TypeScript type checking.
 - `pnpm test:coverage` — collect coverage.
 - `pnpm build` — compile via unbuild to produce dual CJS/ESM bundles.
-- `pnpm cicheck` — run CI checks locally.
+- `pnpm -s cicheck` — run CI checks locally.
 - `pnpm dev` — launch the playground counter demo.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow details.
