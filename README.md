@@ -84,16 +84,30 @@ export const DialogMolecule = molecule<DialogProps>((props) => {
   const isOpen = toSignal(props, "open");
   const isDisabled = computed(() => props.disabled ?? false);
 
-  const requestOpenChange = async (next: boolean) => {
+  const emitOpenChange = async (next: boolean) => {
     if (isDisabled.value || isOpen.value === next) {
       return;
     }
     await send("update:open", next);
   };
 
+  const open = () => {
+    return emitOpenChange(true);
+  };
+
+  const close = () => {
+    return emitOpenChange(false);
+  };
+
+  const toggle = () => {
+    return emitOpenChange(!isOpen.value);
+  };
+
   return {
     on,
-    requestOpenChange,
+    open,
+    close,
+    toggle,
   };
 });
 
@@ -109,7 +123,9 @@ export const DialogControllerMolecule = molecule(() => {
 
   return {
     isOpen: readonly(isOpen),
-    requestOpenChange: dialog.requestOpenChange,
+    open: dialog.open,
+    close: dialog.close,
+    toggle: dialog.toggle,
   };
 });
 ```
@@ -125,7 +141,7 @@ const isOpen = useSignal(dialog.isOpen);
 </script>
 
 <template>
-  <button @click="dialog.requestOpenChange(!isOpen)">
+  <button @click="dialog.toggle">
     {{ isOpen ? "Close" : "Open" }}
   </button>
 </template>
