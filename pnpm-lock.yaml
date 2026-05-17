@@ -13,7 +13,7 @@ importers:
         version: 1.9.4
       '@sigrea/core':
         specifier: ^0.7.0
-        version: 0.7.0
+        version: 0.7.1
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
         version: 5.2.4(vite@5.4.21)(vue@3.5.22(typescript@5.9.3))
@@ -655,8 +655,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sigrea/core@0.7.0':
-    resolution: {integrity: sha512-9fEK8lje0svrcguy94vLfbID1ZZCnxL63o0fVEf+as2jp0EyeE2CGjvPq18BueHp53QxwsdTdnA3ELhPw4O/OQ==}
+  '@sigrea/core@0.7.1':
+    resolution: {integrity: sha512-CDBEsz7sz0LHEZyhtt0nUy53CKA8VU3ENC+IYyQL/P1NmZipUNBTONeXH9sGd7byqMD+Ab4U70VS5RSxYPb5jA==}
     engines: {node: '>=24'}
 
   '@types/chai@5.2.3':
@@ -761,8 +761,8 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  alien-signals@3.1.1:
-    resolution: {integrity: sha512-ogkIWbVrLwKtHY6oOAXaYkAxP+cTH7V5FZ5+Tm4NZFd8VDZ6uNMDrfzqctTZ42eTMCSR3ne3otpcxmqSnFfPYA==}
+  alien-signals@3.2.1:
+    resolution: {integrity: sha512-I8FjmltrfnDFoZedi5CG8DghVYNhzb/Ijluz7tCSJH0xpd0484Kowhbb1XDYOxfJpU1p5wnM2X54dA+IfGyD1g==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -2427,9 +2427,9 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.5':
     optional: true
 
-  '@sigrea/core@0.7.0':
+  '@sigrea/core@0.7.1':
     dependencies:
-      alien-signals: 3.1.1
+      alien-signals: 3.2.1
 
   '@types/chai@5.2.3':
     dependencies:
@@ -2573,7 +2573,7 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  alien-signals@3.1.1: {}
+  alien-signals@3.2.1: {}
 
   ansi-regex@5.0.1: {}
 
