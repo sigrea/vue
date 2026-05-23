@@ -1,31 +1,11 @@
 # @sigrea/vue
 
-`@sigrea/vue` adapts [@sigrea/core](https://www.npmjs.com/package/@sigrea/core) molecule modules and signals for Vue 3's Composition API. It aligns lifecycle scopes with component lifecycles, preserves deep reactivity, and provides composables for `<script setup>` and traditional setup functions.
+Vue 3 composables for [@sigrea/core](https://www.npmjs.com/package/@sigrea/core).
+Use this package when a Vue component needs to mount a molecule, read a Sigrea
+signal, bind a writable signal, or subscribe to a deep signal object.
 
-- **Signal subscriptions.** `useSignal` subscribes to signals and computed values, returning a readonly ref that updates when they change.
-- **Computed subscriptions.** `useComputed` subscribes to computed values, mirroring Vue's `computed` while tracking through Sigrea scopes.
-- **Deep signal subscriptions.** `useDeepSignal` subscribes to deep signal objects and exposes them as mutable refs with automatic cleanup.
-- **Two-way bindings.** `useMutableSignal` wraps primitive signals as `WritableComputedRef` for two-way bindings like `v-model`.
-- **Molecule lifecycles.** `useMolecule` mounts molecule factories and binds their lifecycles to Vue components.
-
-## Table of Contents
-
-- [Install](#install)
-- [Quick Start](#quick-start)
-  - [Consume a Signal](#consume-a-signal)
-  - [Bridge Framework-Agnostic Molecules](#bridge-framework-agnostic-molecules)
-  - [Bind Writable Primitive Signals](#bind-writable-primitive-signals)
-  - [Bind Deep Reactive Objects](#bind-deep-reactive-objects)
-- [API Reference](#api-reference)
-  - [useSignal](#usesignal)
-  - [useComputed](#usecomputed)
-  - [useDeepSignal](#usedeepsignal)
-  - [useMutableSignal](#usemutablesignal)
-  - [useMolecule](#usemolecule)
-- [Testing](#testing)
-- [Handling Scope Cleanup Errors](#handling-scope-cleanup-errors)
-- [Development](#development)
-- [License](#license)
+`@sigrea/vue` does not replace Vue reactivity. It subscribes components to
+Sigrea signals and mounts molecules with the component lifecycle.
 
 ## Install
 
@@ -33,30 +13,178 @@
 npm install @sigrea/vue @sigrea/core vue
 ```
 
-Install `@sigrea/use` as well when shared molecules use utilities such as
-`createEvents`.
-
 Requires Vue 3.4+ and Node.js 24 or later.
+
+Install `@sigrea/use` too if your shared molecules use helpers from that
+package, such as `createEvents`.
 
 ## Quick Start
 
-### Consume a Signal
+Define state in a molecule. Mount that molecule in `<script setup>` with
+`useMolecule()`, then read returned signals with `useSignal()`.
+
+```vue
+<script setup lang="ts">
+import { molecule, readonly, signal } from "@sigrea/core";
+import { useMolecule, useSignal } from "@sigrea/vue";
+
+const CounterMolecule = molecule(() => {
+  const count = signal(0);
+
+  const increment = () => {
+    count.value++;
+  };
+
+  return {
+    count: readonly(count),
+    increment,
+  };
+});
+
+const counter = useMolecule(CounterMolecule);
+const count = useSignal(counter.count);
+</script>
+
+<template>
+  <button type="button" @click="counter.increment">
+    Count: {{ count }}
+  </button>
+</template>
+```
+
+Templates unwrap refs automatically. In script blocks, read the current value as
+`count.value`.
+
+Use `useComputed()` when the source is known to be a `computed()` value and you
+want TypeScript to enforce that. `useSignal()` also works with computed values.
+
+## Molecules With Props
+
+Pass a props object when the molecule only needs the initial values. The
+instance keeps the same snapshot even if the Vue component props change later.
+
+```vue
+<script setup lang="ts">
+import { molecule, readonly, signal } from "@sigrea/core";
+import { useMolecule, useSignal } from "@sigrea/vue";
+
+const componentProps = defineProps<{
+  initialCount: number;
+}>();
+
+const CounterMolecule = molecule((props: { initialCount: number }) => {
+  const count = signal(props.initialCount);
+
+  const reset = () => {
+    count.value = props.initialCount;
+  };
+
+  const increment = () => {
+    count.value++;
+  };
+
+  return {
+    count: readonly(count),
+    increment,
+    reset,
+  };
+});
+
+const counter = useMolecule(CounterMolecule, componentProps);
+const count = useSignal(counter.count);
+</script>
+
+<template>
+  <span>Count: {{ count }}</span>
+  <button type="button" @click="counter.increment">Increment</button>
+  <button type="button" @click="counter.reset">Reset</button>
+</template>
+```
+
+Pass a props getter when the molecule must keep reading updated Vue values. Vue
+tracks dependencies inside the getter through `watchEffect()`.
+
+```vue
+<script setup lang="ts">
+import { computed, molecule } from "@sigrea/core";
+import { useMolecule, useSignal } from "@sigrea/vue";
+
+const componentProps = defineProps<{
+  label: string;
+}>();
+
+const LabelMolecule = molecule((props: { label: string }) => {
+  return {
+    label: computed(() => props.label.trim()),
+  };
+});
+
+const model = useMolecule(LabelMolecule, () => ({ label: componentProps.label }));
+const label = useSignal(model.label);
+</script>
+
+<template>
+  <span>{{ label }}</span>
+</template>
+```
+
+Inside a molecule, read props as `props.name`. Destructuring copies the current
+value and loses reactivity.
+
+## Writable Signals
+
+Use `useMutableSignal()` when a Vue control needs to write back to a primitive
+`signal()`. It returns a `WritableComputedRef`, so it works with `v-model`.
 
 ```vue
 <script setup lang="ts">
 import { signal } from "@sigrea/core";
-import { useSignal } from "@sigrea/vue";
+import { useMutableSignal } from "@sigrea/vue";
 
 const count = signal(0);
-const value = useSignal(count);
+const model = useMutableSignal(count);
 </script>
 
 <template>
-  <span>{{ value }}</span>
+  <label>
+    Count
+    <input type="number" v-model.number="model" />
+  </label>
 </template>
 ```
 
-### Bridge Framework-Agnostic Molecules
+`useMutableSignal()` expects a writable signal created by `signal()`. Passing a
+readonly signal throws at runtime.
+
+## Deep Signals
+
+Use `useDeepSignal()` when a component reads or mutates a `deepSignal()` object.
+Templates unwrap the returned ref, so nested properties work without `.value`.
+
+```vue
+<script setup lang="ts">
+import { deepSignal } from "@sigrea/core";
+import { useDeepSignal } from "@sigrea/vue";
+
+const profile = deepSignal({ name: "Mendako" });
+const model = useDeepSignal(profile);
+</script>
+
+<template>
+  <label>
+    Name
+    <input v-model="model.name" />
+  </label>
+</template>
+```
+
+In script blocks, use `model.value` to access the underlying object.
+
+## Controlled Values
+
+For controlled UI, keep the value in a controller molecule. A child molecule
+calls `send("update:open", next)` when it wants the value to change.
+`@sigrea/use` provides `createEvents()` for this pattern.
 
 ```ts
 // DialogMolecule.ts
@@ -79,43 +207,28 @@ type DialogEvents = {
   "update:open": [next: boolean];
 };
 
-export const DialogMolecule = molecule<DialogProps>((props) => {
+export const DialogMolecule = molecule((props: DialogProps) => {
   const { send, on } = createEvents<DialogEvents>();
   const isOpen = toSignal(props, "open");
   const isDisabled = computed(() => props.disabled ?? false);
 
-  const emitOpenChange = async (next: boolean) => {
+  const setOpen = async (next: boolean) => {
     if (isDisabled.value || isOpen.value === next) {
       return;
     }
+
     await send("update:open", next);
-  };
-
-  const open = () => {
-    return emitOpenChange(true);
-  };
-
-  const close = () => {
-    return emitOpenChange(false);
-  };
-
-  const toggle = () => {
-    return emitOpenChange(!isOpen.value);
   };
 
   return {
     on,
-    open,
-    close,
-    toggle,
+    toggle: () => setOpen(!isOpen.value),
   };
 });
 
 export const DialogControllerMolecule = molecule(() => {
   const isOpen = signal(false);
-  const dialog = get(DialogMolecule, () => ({
-    open: isOpen.value,
-  }));
+  const dialog = get(DialogMolecule, () => ({ open: isOpen.value }));
 
   dialog.on("update:open", (next) => {
     isOpen.value = next;
@@ -123,8 +236,6 @@ export const DialogControllerMolecule = molecule(() => {
 
   return {
     isOpen: readonly(isOpen),
-    open: dialog.open,
-    close: dialog.close,
     toggle: dialog.toggle,
   };
 });
@@ -141,91 +252,19 @@ const isOpen = useSignal(dialog.isOpen);
 </script>
 
 <template>
-  <button @click="dialog.toggle">
+  <button type="button" @click="dialog.toggle">
     {{ isOpen ? "Close" : "Open" }}
   </button>
 </template>
 ```
 
-### Bind Writable Primitive Signals
-
-```vue
-<script setup lang="ts">
-import { signal } from "@sigrea/core";
-import { useMutableSignal } from "@sigrea/vue";
-
-const count = signal(0);
-const model = useMutableSignal(count);
-</script>
-
-<template>
-  <label>
-    Count
-    <input type="number" v-model.number="model" />
-  </label>
-</template>
-```
-
-`useMutableSignal` expects a writable signal produced by `signal()`. Passing a readonly signal throws at runtime so incorrect bindings fail fast.
-
-### Bind Deep Reactive Objects
-
-```vue
-<script setup lang="ts">
-import { deepSignal } from "@sigrea/core";
-import { useDeepSignal } from "@sigrea/vue";
-
-const profile = deepSignal({ name: "Mendako" });
-const model = useDeepSignal(profile);
-</script>
-
-<template>
-  <label>
-    Name
-    <input v-model="model.name" />
-  </label>
-</template>
-```
+Components should not call `dialog.on(...)` in setup. Put those event
+subscriptions in controller molecules. If a Vue wrapper needs `v-model`, wire
+that at the component boundary with Vue's component API.
 
 ## API Reference
 
-### useSignal
-
-```ts
-function useSignal<T>(
-  signal: Signal<T> | ReadonlySignal<T> | Computed<T>
-): DeepReadonly<ShallowRef<T>>
-```
-
-Subscribes to a signal or computed value and returns a readonly Vue ref that updates when the signal changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes. Templates unwrap the ref automatically. In script blocks, access the current value with `value.value`.
-
-Unlike the React adapter, this hook returns a readonly ref rather than the unwrapped value.
-
-### useComputed
-
-```ts
-function useComputed<T>(source: Computed<T>): DeepReadonly<ShallowRef<T>>
-```
-
-Subscribes to a computed value and returns a readonly Vue ref that updates when the computed value changes. The subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes.
-
-### useDeepSignal
-
-```ts
-function useDeepSignal<T extends object>(signal: DeepSignal<T>): ShallowRef<T>
-```
-
-Subscribes to a deep signal and returns a mutable Vue ref. Updates to the deep signal trigger reactivity, and the subscription is cleaned up when the component unmounts, or after server rendering, including any `onServerPrefetch()` work, completes. Templates unwrap the ref automatically, so accessing nested properties requires no `.value`. In script blocks, use `state.value` to access the underlying object.
-
-### useMutableSignal
-
-```ts
-function useMutableSignal<T>(signal: Signal<T>): WritableComputedRef<T>
-```
-
-Wraps a Sigrea signal as a Vue `WritableComputedRef` for two-way bindings like `v-model`. Expects a writable signal created by `signal()`. Passing a readonly signal throws at runtime.
-
-### useMolecule
+### `useMolecule`
 
 ```ts
 function useMolecule<TReturn extends object, TProps extends object | void = void>(
@@ -234,79 +273,108 @@ function useMolecule<TReturn extends object, TProps extends object | void = void
 ): MoleculeInstance<TReturn, TProps>
 ```
 
-Mounts a molecule factory and returns its MoleculeInstance. Sigrea augments the molecule with lifecycle metadata: `onMount` callbacks run after the component mounts, and `onUnmount` callbacks run before it unmounts.
+Mounts a molecule and returns its instance. `onMount`, `watch`, and
+`watchEffect` run after the component mounts. `onUnmount` runs before the
+component unmounts, then the molecule is disposed with the component scope.
 
-**Server Rendering**
+During server rendering, `useMolecule()` creates the instance for the render
+pass but does not mount it. Mount-scope work such as `onMount`, `watch`, and
+`watchEffect` does not run on the server. Unmounted SSR instances are disposed
+after server rendering and `onServerPrefetch()` work complete.
 
-During server rendering, `useMolecule` creates the molecule instance for the render pass but does not mount it. `onMount`, `watch`, `watchEffect`, `onActivated`, and `onDeactivated` do not run on the server. Unmounted instances created during SSR are disposed automatically in a microtask after server rendering, including any `onServerPrefetch()` work, completes.
+Inside Vue's `<KeepAlive>`, `useMolecule()` unmounts mount-scope work when the
+component is deactivated and mounts it again when the component is activated.
+The molecule instance remains alive until the component is finally disposed.
 
-**KeepAlive Support**
+### `useSignal`
 
-When used inside Vue's `<KeepAlive>`, `useMolecule` pauses molecule mount-scope
-work while a component is cached and resumes it on reactivation:
+```ts
+function useSignal<T>(
+  source: Signal<T> | ReadonlySignal<T> | Computed<T>
+): DeepReadonly<ShallowRef<T>>
+```
 
-- **On deactivation** (`onDeactivated`): `watch` effects and ongoing work are paused via `unmountMolecule`. The molecule instance itself remains alive, preserving its internal state.
-- **On reactivation** (`onActivated`): Side effects resume via `mountMolecule`, allowing watches and subscriptions to pick up where they left off.
-- **On final unmount**: The molecule is fully disposed via `disposeMolecule`, releasing all resources.
+Subscribes to a signal or computed value and returns a readonly Vue ref.
+Templates unwrap the ref automatically. In script blocks, use `state.value`.
 
-`unmountMolecule`, `mountMolecule`, and `disposeMolecule` are called internally
-by `useMolecule`. This prevents unnecessary molecule-side work while components
-are cached but invisible, without losing molecule state. Adapter-level live
-props sync created from a props getter remains active until final disposal.
+### `useComputed`
 
-**Props Handling**
+```ts
+function useComputed<T>(source: Computed<T>): DeepReadonly<ShallowRef<T>>
+```
 
-`useMolecule` keeps the same molecule instance while the factory stays the same.
-Passing a props object directly creates an initial snapshot. Passing a props
-getter, such as `() => ({ open: props.open })` or `() => props`, syncs
-top-level props into the instance through Vue's `watchEffect`. Inside a
-molecule, read props as `props.name`; destructuring copies the current value and
-loses reactivity.
+Subscribes to a computed value and returns a readonly Vue ref. Use this when the
+call site should only accept `Computed<T>`.
 
-The props getter follows Vue's reactive tracking. Adapter-level props sync stays
-active until the component is finally disposed, including while a `<KeepAlive>`
-component is deactivated.
+### `useMutableSignal`
 
-Controller molecules handle `update:open`, `update:value`, and similar events
-from child molecules. Vue components mount the controller molecule and read its
-returned signals. If a UI wrapper needs to expose `v-model`, bridge it at the
-wrapper boundary using Vue's component API. Components should not subscribe to
-raw molecule events directly.
+```ts
+function useMutableSignal<T>(source: Signal<T>): WritableComputedRef<T>
+```
+
+Wraps a writable Sigrea signal as a Vue `WritableComputedRef`.
+
+### `useDeepSignal`
+
+```ts
+function useDeepSignal<T extends object>(source: DeepSignal<T>): ShallowRef<T>
+```
+
+Subscribes to a deep signal object and returns a mutable shallow ref. Nested
+writes trigger Vue updates, and cleanup runs when the component scope is
+disposed or after SSR cleanup.
+
+### `useSnapshot`
+
+```ts
+function useSnapshot<T>(handler: SnapshotHandler<T>): DeepReadonly<ShallowRef<T>>
+function useSnapshot<T>(
+  handler: SnapshotHandler<T>,
+  options: { mode: "mutable" }
+): ShallowRef<T>
+```
+
+Low-level composable for custom snapshot handlers from `@sigrea/core`. Most
+apps use `useSignal`, `useComputed`, `useMutableSignal`, or `useDeepSignal`
+instead.
 
 ## Testing
 
-```ts
-// tests/Counter.test.ts
-import { mount } from "@vue/test-utils";
-import Counter from "../components/Counter.vue";
+Use the same shape in tests as in components: mount the component, interact with
+it, and assert the rendered result.
 
-it("increments and displays the updated count", async () => {
-  const wrapper = mount(Counter, {
-    props: { initialCount: 10 },
-  });
+```ts
+import { mount } from "@vue/test-utils";
+import Counter from "./Counter.vue";
+
+it("increments the counter", async () => {
+  const wrapper = mount(Counter);
 
   await wrapper.find("button").trigger("click");
 
-  expect(wrapper.text()).toContain("11");
+  expect(wrapper.text()).toContain("Count: 1");
 });
 ```
 
+For molecule-only tests, use `trackMolecule()` and
+`disposeTrackedMolecules()` from `@sigrea/core` so mount-scope work is cleaned
+up after each test.
+
 ## Handling Scope Cleanup Errors
 
-For global error handling configuration, see [@sigrea/core - Handling Scope Cleanup Errors](https://github.com/sigrea/core#handling-scope-cleanup-errors).
+For global error handling configuration, see
+[@sigrea/core - Handling Scope Cleanup Errors](https://github.com/sigrea/core#handling-scope-cleanup-errors).
 
-In Vue apps, configure the handler in your application entry point before mounting:
+Configure the handler in your application entry point before mounting:
 
 ```ts
-// main.ts
 import { setScopeCleanupErrorHandler } from "@sigrea/core";
 import { createApp } from "vue";
 import App from "./App.vue";
 
 setScopeCleanupErrorHandler((error, context) => {
-  console.error(`Cleanup failed:`, error);
+  console.error("Cleanup failed:", error);
 
-  // Forward to monitoring service
   if (typeof Sentry !== "undefined") {
     Sentry.captureException(error, {
       tags: { scopeId: context.scopeId, phase: context.phase },
@@ -321,24 +389,18 @@ createApp(App).mount("#app");
 
 This repo targets Node.js 24 or later.
 
-If you use mise:
+- `pnpm install` installs dependencies.
+- `pnpm test` runs the Vitest suite once.
+- `pnpm typecheck` runs TypeScript checks.
+- `pnpm test:coverage` collects coverage.
+- `pnpm build` builds CJS and ESM bundles with unbuild.
+- `pnpm -s cicheck` runs the local CI chain.
+- `pnpm dev` launches the playground counter demo.
 
-- `mise trust -y` — trust `mise.toml` (first run only).
-- `pnpm -s cicheck` — run CI-equivalent checks locally.
-- `mise run notes` — preview release notes (optional).
-
-You can also run pnpm scripts directly:
-
-- `pnpm install` — install dependencies.
-- `pnpm test` — run the Vitest suite once (no watch).
-- `pnpm typecheck` — run TypeScript type checking.
-- `pnpm test:coverage` — collect coverage.
-- `pnpm build` — compile via unbuild to produce dual CJS/ESM bundles.
-- `pnpm -s cicheck` — run CI checks locally.
-- `pnpm dev` — launch the playground counter demo.
+If you use mise, run `mise trust -y` once before using mise tasks.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for workflow details.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE).
