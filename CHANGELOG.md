@@ -1,5 +1,25 @@
 # @sigrea/vue
 
+## v0.7.1
+
+[compare changes](https://github.com/sigrea/vue/compare/v0.7.0...v0.7.1)
+
+### 📖 Documentation
+
+- Clarify event-driven action examples ([#23](https://github.com/sigrea/vue/pull/23))
+- Improve Vue adapter package docs ([#24](https://github.com/sigrea/vue/pull/24))
+- Link use references in Vue README ([#25](https://github.com/sigrea/vue/pull/25))
+
+### 🏡 Chore
+
+- Harden Vue adapter contract and release checks ([#20](https://github.com/sigrea/vue/pull/20))
+- Refresh browser compatibility data ([#21](https://github.com/sigrea/vue/pull/21))
+- Verify core 0.7.1 dependency ([#22](https://github.com/sigrea/vue/pull/22))
+
+### ❤️ Contributors
+
+- Aose ([@aose-yuu](https://github.com/aose-yuu))
+
 ## v0.7.0
 
 [compare changes](https://github.com/sigrea/vue/compare/v0.6.1...v0.7.0)
