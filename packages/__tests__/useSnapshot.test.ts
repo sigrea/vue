@@ -1,7 +1,7 @@
 import type { SnapshotHandler } from "@sigrea/core";
 import { createSignalHandler, signal } from "@sigrea/core";
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { defineComponent, h } from "vue";
 
 import { useSnapshot } from "../useSnapshot";
