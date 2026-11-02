@@ -388,17 +388,33 @@ createApp(App).mount("#app");
 
 ## Development
 
-This repo targets Node.js 24 or later.
+Install [Vite+](https://viteplus.dev/guide/), then run:
 
-- `pnpm install` installs dependencies.
-- `pnpm test` runs the Vitest suite once.
-- `pnpm typecheck` runs TypeScript checks.
-- `pnpm test:coverage` collects coverage.
-- `pnpm build` builds CJS and ESM bundles with unbuild.
-- `pnpm -s cicheck` runs the local CI chain.
-- `pnpm dev` launches the playground counter demo.
+```sh
+vp env install
+vp install --frozen-lockfile
+vp run cicheck
+```
 
-If you use mise, run `mise trust -y` once before using mise tasks.
+Development uses Node.js 26.13.0 LTS and pnpm 12.16.1, pinned in
+`.node-version` and `package.json`. The published library still supports Node.js 24+.
+Vite+ manages this project's runtime and package manager; a global mise installation
+can remain in use for other projects.
+
+- `vp check` checks formatting, lint rules, and TypeScript types.
+- `vp test run` runs tests; `vp test run --coverage` collects V8 coverage.
+- `vp pack` builds the ESM/CJS library and declaration files.
+- `vp fmt` applies formatting.
+- `vp run notes` previews release notes.
+
+The pre-commit hook formats and checks staged source files, then runs all tests.
+`vp install` sets up the hook via `prepare`.
+
+- `vp run dev` launches the playground counter demo.
+- `vp run playground:build` builds the playground.
+
+Vue SFC templates are built by the Vue plugin. As before, they are not included
+in the TypeScript check; this project does not run `vue-tsc`.
 
 See [CONTRIBUTING.md](https://github.com/sigrea/vue/blob/main/CONTRIBUTING.md)
 for workflow details.
