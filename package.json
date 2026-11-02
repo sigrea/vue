@@ -48,8 +48,8 @@
 		"prepare": "vp config --no-agent",
 		"playground:build": "vp build --config playground/vite.config.ts",
 		"notes": "vp exec changelogen --no-output",
-		"release_version": "sh scripts/release-version.sh",
-		"push_release": "sh scripts/push-release.sh"
+		"release_version": "node scripts/release.js prepare",
+		"push_release": "node scripts/release.js push"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.5",
@@ -60,6 +60,7 @@
 		"@vue/test-utils": "^2.4.0",
 		"changelogen": "^0.6.2",
 		"jsdom": "^24.1.3",
+		"semver": "^7.7.3",
 		"typescript": "5.9.3",
 		"vite": "catalog:",
 		"vite-plus": "catalog:",
