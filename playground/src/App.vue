@@ -40,7 +40,14 @@ const updateInitialStep = (value: number) => {
 							type="number"
 							:value="initialCount"
 							:disabled="showCounter"
-							@input="updateInitialCount(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 0)"
+							@input="
+								updateInitialCount(
+									Number.parseInt(
+										($event.target as HTMLInputElement).value,
+										10,
+									) || 0,
+								)
+							"
 						/>
 					</label>
 					<label class="playground__input">
@@ -50,7 +57,14 @@ const updateInitialStep = (value: number) => {
 							min="1"
 							:value="initialStep"
 							:disabled="showCounter"
-							@input="updateInitialStep(Number.parseInt(($event.target as HTMLInputElement).value, 10) || 1)"
+							@input="
+								updateInitialStep(
+									Number.parseInt(
+										($event.target as HTMLInputElement).value,
+										10,
+									) || 1,
+								)
+							"
 						/>
 					</label>
 				</div>

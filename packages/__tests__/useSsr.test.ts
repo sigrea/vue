@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { createSSRApp, h, onServerPrefetch } from "vue";
 import { renderToString } from "vue/server-renderer";
 

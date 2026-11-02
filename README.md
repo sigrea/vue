@@ -388,20 +388,20 @@ createApp(App).mount("#app");
 
 ## Development
 
-This repo targets Node.js 24 or later.
+Install [Vite+](https://viteplus.dev/guide/), then run:
 
-- `pnpm install` installs dependencies.
-- `pnpm test` runs the Vitest suite once.
-- `pnpm typecheck` runs TypeScript checks.
-- `pnpm test:coverage` collects coverage.
-- `pnpm build` builds CJS and ESM bundles with unbuild.
-- `pnpm -s cicheck` runs the local CI chain.
-- `pnpm dev` launches the playground counter demo.
+```sh
+vp env install
+vp install --frozen-lockfile
+vp run cicheck
+```
 
-If you use mise, run `mise trust -y` once before using mise tasks.
+Run `vp run dev` to start the playground.
+
+Vue templates are built but not type-checked; `vue-tsc` is not installed.
 
 See [CONTRIBUTING.md](https://github.com/sigrea/vue/blob/main/CONTRIBUTING.md)
-for workflow details.
+for individual commands and the release workflow.
 
 ## License
 

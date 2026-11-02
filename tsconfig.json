@@ -10,11 +10,11 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"outDir": "dist",
-		"types": ["vitest/globals", "vue"],
-		"baseUrl": ".",
+		"types": ["vitest/globals", "vue", "node"],
 		"paths": {
 			"@sigrea/vue": ["./index.ts"]
-		}
+		},
+		"rootDir": "."
 	},
 	"include": [
 		"index.ts",
