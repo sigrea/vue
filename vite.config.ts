@@ -15,29 +15,17 @@ export default defineConfig({
 		entry: ["index.ts"],
 		format: ["esm", "cjs"],
 		dts: true,
-		clean: true,
 		outExtensions: ({ format }) => ({
 			js: format === "es" ? ".mjs" : ".cjs",
 			dts: format === "es" ? ".d.ts" : ".d.cts",
 		}),
-		attw: { profile: "strict" },
+		attw: { profile: "strict", level: "error" },
 	},
 	test: {
 		environment: "jsdom",
 		coverage: {
 			include: ["index.ts", "packages/**/*.{ts,tsx}"],
 			exclude: ["**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
-		},
-		passWithNoTests: true,
-	},
-	run: {
-		tasks: {
-			notes: { command: "vp exec changelogen --no-output", cache: false },
-			release_version: {
-				command: "sh scripts/release-version.sh",
-				cache: false,
-			},
-			push_release: { command: "sh scripts/push-release.sh", cache: false },
 		},
 	},
 	staged: { "*.{ts,tsx,js,jsx,json,vue}": "vp check --fix" },

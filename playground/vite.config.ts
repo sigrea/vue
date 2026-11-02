@@ -6,13 +6,6 @@ const rootDir = import.meta.dirname;
 const projectRoot = path.resolve(rootDir, "..");
 
 export default defineConfig({
-	test: {
-		// Vitest v4 compatibility: preserve mock call history.
-		// Remove after tests no longer rely on calls from setup or earlier tests.
-		// https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
-		// https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
-		clearMocks: false,
-	},
 	root: rootDir,
 	plugins: [vue()],
 	server: {

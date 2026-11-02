@@ -42,18 +42,14 @@
 	},
 	"scripts": {
 		"dev": "vp dev --config playground/vite.config.ts",
-		"build": "vp pack",
 		"prepack": "vp pack",
 		"smoke": "node --input-type=module -e \"const mod = await import('@sigrea/vue'); for (const key of ['useMolecule', 'useSignal']) { if (typeof mod[key] !== 'function') throw new Error(key + ' export is missing'); }\" && node -e \"const mod = require('@sigrea/vue'); for (const key of ['useMolecule', 'useSignal']) { if (typeof mod[key] !== 'function') throw new Error(key + ' export is missing'); }\"",
-		"changelog": "changelogen",
-		"test": "vp test run",
-		"test:coverage": "vp test run --coverage",
-		"typecheck": "vp check --no-fmt --no-lint",
-		"format": "vp fmt --check",
-		"format:fix": "vp fmt",
 		"cicheck": "vp check && vp test run && vp pack && vp run smoke",
 		"prepare": "vp config --no-agent",
-		"playground:build": "vp build --config playground/vite.config.ts"
+		"playground:build": "vp build --config playground/vite.config.ts",
+		"notes": "vp exec changelogen --no-output",
+		"release_version": "sh scripts/release-version.sh",
+		"push_release": "sh scripts/push-release.sh"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.5",
